@@ -50,7 +50,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold" href="index.php">CV GEN</a>
             <div class="ms-auto">
-                <a href="formulaire.php" class="nav-link d-inline-block text-white px-3">Générer mon CV</a>
+                <a href="cv.php" class="nav-link d-inline-block text-white px-3">Générer mon CV</a>
                 <a href="modeles.php" class="nav-link d-inline-block text-white px-3">Modèles</a>
                 <a href="contact.php" class="nav-link d-inline-block text-white px-3 fw-bold">Contact</a>
             </div>

@@ -55,7 +55,7 @@
         <div class="container">
             <a class="navbar-brand fw-bold" href="index.php">CV GEN</a>
             <div class="ms-auto">
-                <a href="formulaire.php" class="nav-link d-inline-block text-white px-3">Générer mon CV</a>
+                <a href="cv.php" class="nav-link d-inline-block text-white px-3">Générer mon CV</a>
                 <a href="modeles.php" class="nav-link d-inline-block text-white px-3">Modèles</a>
                 <a href="contact.php" class="nav-link d-inline-block text-white px-3">Contact</a>
             </div>
@@ -66,7 +66,7 @@
         <div class="container">
             <h1 class="display-3 fw-bold mb-3">Votre CV professionnel en 5 minutes</h1>
             <p class="lead mb-5 opacity-75">Concevez, personnalisez et exportez votre CV au format PDF avec un rendu impeccable.</p>
-            <a href="formulaire.php" class="btn btn-light btn-lg btn-modern text-primary shadow">Créer mon CV maintenant</a>
+            <a href="cv.php" class="btn btn-light btn-lg btn-modern text-primary shadow">Créer mon CV maintenant</a>
         </div>
     </header>
 
