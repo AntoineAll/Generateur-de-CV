@@ -16,21 +16,33 @@
 
         #cv-sheet { 
             background: white; width: 100%; max-width: 550px; height: 100%; 
-            padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
-            display: flex; flex-direction: column; font-size: 0.82rem; overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+            display: block; font-size: 0.82rem; overflow-y: auto;
+            position: relative;
         }
 
-        /* Style de la photo dans l'aperçu */
-        .preview-photo {
-            width: 100px; height: 100px;
-            object-fit: cover; border-radius: 50%;
-            border: 3px solid #0d6efd; margin-bottom: 10px;
-            display: none; /* Masquée par défaut si pas de photo */
-        }
+        /* --- STRUCTURES DES TEMPLATES --- */
+        .tpl-sidebar { width: 35%; float: left; padding: 20px; background: #f8f9fa; min-height: 100%; }
+        .tpl-main { width: 65%; float: left; padding: 20px; }
+        .tpl-header { width: 100%; display: none; padding: 20px; border-bottom: 2px solid #0d6efd; margin-bottom: 10px; }
 
+        /* Template 2 : Sidebar à Droite */
+        .template-2 .tpl-sidebar { float: right; border-left: 1px solid #eee; }
+        .template-2 .tpl-main { float: left; }
+
+        /* Template 3 : Header Top */
+        .template-3 .tpl-header { display: block; text-align: center; }
+        .template-3 .tpl-sidebar { width: 30%; }
+        .template-3 .tpl-main { width: 70%; }
+
+        /* Template 4 : Moderne Dark */
+        .template-4 .tpl-header { display: block; background: #212529; color: white; text-align: right; }
+
+        .preview-photo { width: 100px; height: 100px; object-fit: cover; border-radius: 50%; border: 3px solid #0d6efd; margin-bottom: 10px; display: none; }
         .card { border: none; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
         .section-header { border-bottom: 2px solid #0d6efd; color: #0d6efd; font-weight: bold; margin-top: 12px; margin-bottom: 8px; font-size: 0.7rem; text-transform: uppercase; }
         .dynamic-block { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; margin-bottom: 15px; position: relative; }
+        .clearfix::after { content: ""; clear: both; display: table; }
     </style>
 </head>
 <body>
@@ -45,6 +57,16 @@
         <div class="form-column">
             <form action="export.php" method="POST" id="cvForm" enctype="multipart/form-data">
                 
+                <div class="card p-4 border-primary border">
+                    <h6 class="fw-bold text-primary mb-3">Choix du Template Graphique</h6>
+                    <select name="template_id" id="templateSelector" class="form-select" onchange="updateTemplate()">
+                        <option value="1">Croquis 31 : Sidebar Gauche</option>
+                        <option value="2">Croquis 35 : Sidebar Droite</option>
+                        <option value="3">Croquis 37 : En-tête Centré</option>
+                        <option value="4">Croquis 33 : Moderne Dark Header</option>
+                    </select>
+                </div>
+
                 <div class="card p-4">
                     <h6 class="fw-bold mb-3 text-primary">Photo & Identité</h6>
                     <div class="row g-3">
@@ -106,42 +128,66 @@
         </div>
 
         <div class="preview-column">
-            <div id="cv-sheet">
-                <div class="text-center">
-                    <img id="view-photo" src="" class="preview-photo mx-auto">
-                    <h2 id="view-name" class="fw-bold mb-1">PRÉNOM NOM</h2>
-                    <p id="view-titre" class="text-primary fw-bold mb-1">Headline</p>
-                    <div class="small text-muted" id="view-contact">Contact Info</div>
-                </div>
+            <div id="cv-sheet" class="template-1 clearfix">
                 
-                <hr class="my-2">
-                <div id="view-resume" class="mb-2 small" style="font-style: italic;"></div>
+                <div id="area-header" class="tpl-header"></div>
 
-                <div class="section-header">Expériences</div>
-                <div id="view-experience"></div>
-
-                <div class="section-header">Formations</div>
-                <div id="view-formation"></div>
-
-                <div class="row">
-                    <div class="col-6">
-                        <div class="section-header">Compétences</div>
-                        <div id="view-competence" class="d-flex flex-wrap"></div>
+                <div class="tpl-sidebar text-center">
+                    <img id="view-photo" src="" class="preview-photo mx-auto">
+                    <div id="area-sidebar-identity">
+                        <h2 id="view-name" class="fw-bold mb-1">PRÉNOM NOM</h2>
+                        <p id="view-titre" class="text-primary fw-bold mb-1">Headline</p>
                     </div>
-                    <div class="col-6">
-                        <div class="section-header">Langues</div>
-                        <div id="view-langue" class="small"></div>
-                    </div>
+                    <div class="section-header">Contact</div>
+                    <div id="view-contact" class="small text-muted mb-2"></div>
+                    
+                    <div class="section-header">Compétences</div>
+                    <div id="view-competence" class="d-flex flex-wrap justify-content-center"></div>
+                    
+                    <div class="section-header">Langues</div>
+                    <div id="view-langue" class="small"></div>
                 </div>
 
-                <div class="section-header">Centres d'intérêt</div>
-                <div id="view-interet" class="small"></div>
+                <div class="tpl-main">
+                    <div id="area-main-identity"></div>
+                    <div class="section-header">Résumé</div>
+                    <div id="view-resume" class="mb-2 small" style="font-style: italic;"></div>
+
+                    <div class="section-header">Expériences</div>
+                    <div id="view-experience"></div>
+
+                    <div class="section-header">Formations</div>
+                    <div id="view-formation"></div>
+
+                    <div class="section-header">Centres d'intérêt</div>
+                    <div id="view-interet" class="small"></div>
+                </div>
+
             </div>
         </div>
     </main>
 </div>
 
 <script>
+    // --- GESTION DES TEMPLATES (SWITCH VISUEL en temps réel du template choisi) ---
+    function updateTemplate() {
+        const val = document.getElementById('templateSelector').value;
+        const sheet = document.getElementById('cv-sheet');
+        const header = document.getElementById('area-header');
+        const sidebarId = document.getElementById('area-sidebar-identity');
+        
+        sheet.className = 'template-' + val + ' clearfix';
+
+        if (val == "3" || val == "4") {
+            header.innerHTML = sidebarId.innerHTML; 
+            sidebarId.style.display = 'none';
+        } else {
+            header.innerHTML = '';
+            sidebarId.style.display = 'block';
+        }
+        liveUpdate(); // Rafraîchir les données après le switch
+    }
+
     // --- GESTION PHOTO ---
     function previewImage(input) {
         const preview = document.getElementById('view-photo');
@@ -149,7 +195,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 preview.src = e.target.result;
-                preview.style.display = 'block'; // On affiche l'image dès qu'elle est chargée
+                preview.style.display = 'block';
             }
             reader.readAsDataURL(input.files[0]);
         }
@@ -193,8 +239,12 @@
     // --- MISE À JOUR LIVE ---
     function liveUpdate() {
         const f = new FormData(document.getElementById('cvForm'));
-        document.getElementById('view-name').innerText = (f.get('prenom') + ' ' + f.get('nom')).toUpperCase();
-        document.getElementById('view-titre').innerText = f.get('titre') || "Headline";
+        const name = (f.get('prenom') + ' ' + f.get('nom')).toUpperCase();
+        
+        // Ciblage par ID + s'assurer que si c'est déplacé dans le header, ça marche
+        document.querySelectorAll('#view-name').forEach(el => el.innerText = name);
+        document.querySelectorAll('#view-titre').forEach(el => el.innerText = f.get('titre') || "Headline");
+        
         document.getElementById('view-contact').innerText = f.get('email') + (f.get('telephone') ? ' | ' + f.get('telephone') : '');
         document.getElementById('view-resume').innerText = f.get('resume');
 
@@ -206,7 +256,7 @@
             const fn = document.getElementsByName(type+'_fin[]');
             const ds = document.getElementsByName(type+'_desc[]');
             for(let i=0; i<t.length; i++) {
-                if(t[i].value) h += `<div class='mb-2'><strong>${t[i].value}</strong> @ ${e[i].value}<br><small class='text-primary'>${d[i].value} - ${fn[i].value}</small><p class='m-0' style='font-size:0.7rem'>${ds[i].value}</p></div>`;
+                if(t[i].value) h += `<div class='mb-2 text-start'><strong>${t[i].value}</strong> @ ${e[i].value}<br><small class='text-primary'>${d[i].value} - ${fn[i].value}</small><p class='m-0' style='font-size:0.7rem'>${ds[i].value}</p></div>`;
             }
             document.getElementById('view-'+type).innerHTML = h;
         });
@@ -230,6 +280,9 @@
         for(let i=0; i<iN.length; i++) { if(iN[i].value) iH.push(iN[i].value); }
         document.getElementById('view-interet').innerText = iH.join(', ');
     }
+
+    // Initialisation
+    window.onload = updateTemplate;
 </script>
 </body>
 </html>
