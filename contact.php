@@ -53,6 +53,7 @@
                 <a href="cv.php" class="nav-link d-inline-block text-white px-3">Générer mon CV</a>
                 <a href="modeles.php" class="nav-link d-inline-block text-white px-3">Modèles</a>
                 <a href="contact.php" class="nav-link d-inline-block text-white px-3 fw-bold">Contact</a>
+                <a href="account.php" class="nav-link d-inline-block text-white px-3 fw-bold">Mon compte</a>
             </div>
         </div>
     </nav>
