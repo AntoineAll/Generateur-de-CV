@@ -1,3 +1,7 @@
+<?php 
+//Récupération de l'id du template quand on arrive de modeles.php et que l'on a choisi un template en particulier 
+$tpl_id = $_GET['tpl'] ?? '1'; 
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -273,7 +277,10 @@
     <div class="app-container">
         <header class="d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold">CV GEN <small class="fw-normal opacity-50">| Editeur</small></h5>
-            <a href="index.php" class="btn btn-sm btn-outline-light">Retour Accueil</a>
+            <div class="d-flex gap-2">
+                <a href="modeles.php" class="btn btn-sm btn-outline-info">Voir les modèles</a>
+                <a href="index.php" class="btn btn-sm btn-outline-light">Retour Accueil</a>
+            </div>
         </header>
 
         <main class="editor-zone">
@@ -282,10 +289,10 @@
                     <div class="card p-3 border-primary border">
                         <label class="fw-bold mb-2">Modèle & Contraste</label>
                         <select name="template_id" id="templateSelector" class="form-select" onchange="updateTemplate()">
-                            <option value="1">Modèle Bleu Royal (Classique)</option>
-                            <option value="2">Modèle Vert Émeraude (Inversé)</option>
-                            <option value="3" selected>Modèle Ultra Violet (Moderne)</option>
-                            <option value="4">Modèle Midnight & Gold (Premium)</option>
+                            <option value="1" <?php echo ($tpl_id == '1') ? 'selected' : ''; ?>>Modèle Bleu Royal (Classique)</option>
+                            <option value="2" <?php echo ($tpl_id == '2') ? 'selected' : ''; ?>>Modèle Vert Émeraude (Inversé)</option>
+                            <option value="3" <?php echo ($tpl_id == '3') ? 'selected' : ''; ?>>Modèle Ultra Violet (Moderne)</option>
+                            <option value="4" <?php echo ($tpl_id == '4') ? 'selected' : ''; ?>>Modèle Midnight & Gold (Premium)</option>
                         </select>
                     </div>
 
@@ -347,7 +354,7 @@
             </div>
 
             <div class="preview-column" id="previewContainer">
-                <div id="cv-sheet" class="template-3">
+                <div id="cv-sheet" class="template-1">
                     <div id="area-header" class="tpl-header"></div>
                     
                     <div class="tpl-container">
@@ -412,7 +419,10 @@
             const sheet = document.getElementById('cv-sheet');
             const header = document.getElementById('area-header');
             const sidebarId = document.getElementById('area-sidebar-identity');
-            sheet.className = 'template-' + val;
+            
+            // On enlève toutes les classes template et on met la nouvelle
+            sheet.classList.remove('template-1', 'template-2', 'template-3', 'template-4');
+            sheet.classList.add('template-' + val);
             
             if (val == "3" || val == "4") 
             {
@@ -504,7 +514,11 @@
             }
         }
 
-        window.onload = () => { updateTemplate(); autoZoom(); };
+        // Lancement au chargement
+        window.onload = () => { 
+            updateTemplate(); 
+            autoZoom();
+        };
         window.onresize = autoZoom;
     </script>
 </body>
