@@ -28,7 +28,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
         'experience_titre', 'experience_etab', 'experience_debut', 'experience_fin', 'experience_desc',
         'formation_titre', 'formation_etab', 'formation_debut', 'formation_fin',
         'competence_nom', 'competence_niveau',
-        'langue_nom', 'langue_niveau'
+        'langue_nom', 'langue_niveau', 'interet_nom'
     ];
 
     foreach ($list_fields as $field)
@@ -112,6 +112,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST')
 
 } else {
     // Si on accède au fichier sans POST, on va retourner à l'accueil
-    header('Location: index.php');
+    header('Location: index.html');
     exit;
 }

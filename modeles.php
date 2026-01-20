@@ -53,11 +53,11 @@
 
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
-        <a class="navbar-brand fw-bold" href="index.php">CV GEN</a>
+        <a class="navbar-brand fw-bold" href="index.html">CV GEN</a>
         <div class="navbar-nav ms-auto">
-            <a class="nav-link d-inline-block text-white px-3" href="index.php">Accueil</a>
-            <a class="nav-link d-inline-block text-white px-3 active" href="modeles.php">Modèles</a>
-            <a class="nav-link d-inline-block text-white px-3 active" href="contact.php">Contact</a>
+            <a class="nav-link d-inline-block text-white px-3" href="index.html">Accueil</a>
+            <a class="nav-link d-inline-block text-white px-3 fw-bold" href="modeles.php">Modèles</a>
+            <a class="nav-link d-inline-block text-white px-3" href="contact.php">Contact</a>
             <a class="nav-link d-inline-block text-white px-3" href="account.php">Mon Compte</a>
         </div>
     </div>
@@ -100,9 +100,9 @@
     </div>
 </div>
 
-<footer class="py-4 mt-5 border-top">
-    <div class="container text-center text-muted small">
-        &copy; 2026 Antoine ALLARD - Tous droits réservés.
+<footer class="py-3 bg-white border-top fixed-bottom">
+    <div class="container text-center text-muted">
+        <p class="mb-0 small">&copy; 2026 Antoine ALLARD - Tous droits réservés.</p>
     </div>
 </footer>
 

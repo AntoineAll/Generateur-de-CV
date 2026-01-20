@@ -9,7 +9,7 @@
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="fw-bold">Historique de mes CV</h2>
-            <a href="index.php" class="btn btn-outline-secondary">Retour</a>
+            <a href="index.html" class="btn btn-outline-secondary">Retour</a>
         </div>
 
         <div class="row g-3">

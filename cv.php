@@ -279,7 +279,7 @@ $tpl_id = $_GET['tpl'] ?? '1';
             <h5 class="mb-0 fw-bold">CV GEN <small class="fw-normal opacity-50">| Editeur</small></h5>
             <div class="d-flex gap-2">
                 <a href="modeles.php" class="btn btn-sm btn-outline-info">Voir les modèles</a>
-                <a href="index.php" class="btn btn-sm btn-outline-light">Retour Accueil</a>
+                <a href="index.html" class="btn btn-sm btn-outline-light">Retour Accueil</a>
             </div>
         </header>
 
