@@ -1,56 +1,268 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <style>
-        @page { margin: 0; }
-        body { font-family: Helvetica, sans-serif; margin: 0; padding: 0; font-size: 11px; }
-        table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-        .sidebar { width: 30%; background: #1e272e; color: #ffffff; vertical-align: top; padding: 30px 20px; height: 297mm; }
-        .main { width: 70%; padding: 40px; vertical-align: top; background: #ffffff; }
-        .gold { color: #f1c40f; }
-        .section-title { color: #f1c40f; border-bottom: 1px solid #f1c40f; padding-bottom: 5px; margin: 25px 0 15px 0; text-transform: uppercase; }
+        /* --- CONFIGURATION GLOBALE --- */
+        @page { margin: 0; size: A4; }
+        :root {
+            --main-color: #212529;
+            --accent-color: #f1c40f;
+            --side-bg: #f8f9fa;    
+            --text-side: #2d3436;
+            --header-bg: #212529;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', Helvetica, Arial, sans-serif;
+            color: #333;
+            background: #ffffff;
+            -webkit-print-color-adjust: exact;
+        }
+
+        .tpl-container {
+            width: 210mm;
+            height: 297mm;
+            position: relative;
+            background: white;
+            overflow: hidden;
+        }
+
+        /* --- HEADER ALIGNÉ À DROITE --- */
+        .tpl-header {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 48mm;
+            background: #000000;
+            border-bottom: 5px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-end; 
+            text-align: right;     
+            padding-right: 100px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        h1 { margin: 0; color: #ffffff; font-size: 2.3rem; text-transform: uppercase; line-height: 1; }
+        
+        .job-title { 
+            margin: 5px 0 10px 0; 
+            font-size: 1.1rem; 
+            color: var(--accent-color);
+            letter-spacing: 2px; 
+            text-transform: uppercase; 
+            font-weight: 600; 
+        }
+
+        .contact-top {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.85rem;
+            color: #f8f9fa;
+        }
+
+        /* --- CORPS --- */
+        .tpl-sidebar {
+            position: absolute;
+            top: 48mm;
+            left: 0;
+            width: 75mm;
+            height: calc(297mm - 48mm);
+            background: var(--text-side);
+            padding: 25px 20px;
+            box-sizing: border-box;
+            color: var(--side-bg);
+        }
+
+        .sidebar-photo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .preview-photo {
+            width: 110px;
+            height: 110px;
+            border: 3px solid var(--accent-color);
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .tpl-main {
+            position: absolute;
+            top: 48mm;
+            left: 75mm;
+            width: 135mm;
+            height: calc(297mm - 48mm);
+            padding: 30px 40px 30px 30px;
+            box-sizing: border-box;
+            background: #ffffff;
+        }
+
+        /* --- STYLES SECTIONS --- */
+        .section-wrapper { margin-bottom: 22px; width: 100%; }
+
+        .section-header {
+            border-bottom: 2px solid var(--accent-color);
+            color: var(--main-color);
+            font-weight: bold;
+            margin-bottom: 12px;
+            padding-bottom: 5px;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            width: 85%; 
+        }
+
+        .sidebar-header {
+            border-bottom: 2px solid var(--accent-color);
+            color: var(--accent-color);
+            margin-bottom: 12px;
+            padding-bottom: 5px;
+            font-weight: bold;
+            font-size: 0.82rem;
+            text-transform: uppercase;
+            width: 85%;
+        }
+
+        .small { 
+            font-size: 0.85rem; 
+            line-height: 1.4; 
+            max-width: 85%; 
+            word-wrap: break-word;
+        }
+
+        .badge-limit {
+            max-width: 85%;
+            display: block;
+        }
+
+        .badge-item {
+            display: inline-block;
+            background: var(--main-color); 
+            color: var(--side-bg);               
+            padding: 3px 8px;
+            border-radius: 4px;
+            margin-right: 4px;
+            margin-bottom: 6px;
+            font-size: 0.72rem;
+            font-weight: 600;
+        }
+
+        .fw-bold { font-weight: bold; }
+        .text-muted { color: #666; font-size: 0.8rem; }
     </style>
 </head>
 <body>
-    <table>
-        <tr>
-            <td class="sidebar">
-                <h1 class="gold" style="margin:0; font-size:24px;"><?= mb_strtoupper($cv['prenom']) ?><br><?= mb_strtoupper($cv['nom']) ?></h1>
-                <p style="margin-top:10px; opacity: 0.8;"><?= htmlspecialchars($cv['titre']) ?></p>
 
-                <div class="section-title">Contact</div>
-                <p><?= htmlspecialchars($cv['email']) ?><br><?= htmlspecialchars($cv['telephone']) ?></p>
+<div class="tpl-container">
+    <header class="tpl-header">
+        <h1><?= htmlspecialchars($cv['prenom']) ?> <span class="fw-bold"><?= htmlspecialchars($cv['nom']) ?></span></h1>
+        <div class="job-title"><?= htmlspecialchars($cv['titre'] ?? '') ?></div>
+        
+        <div class="contact-top">
+            <?php if(!empty($cv['email'])): ?>
+                <div><?= htmlspecialchars($cv['email']) ?></div>
+            <?php endif; ?>
+            <?php if(!empty($cv['telephone'])): ?>
+                <div><?= htmlspecialchars($cv['telephone']) ?></div>
+            <?php endif; ?>
+        </div>
+    </header>
 
-                <div class="section-title">Langues</div>
-                <?php foreach ($cv['langue_nom'] as $i => $nom): if(!empty($nom)): ?>
-                    <p><?= htmlspecialchars($nom) ?><br><span class="gold"><?= htmlspecialchars($cv['langue_niveau'][$i]) ?></span></p>
+    <aside class="tpl-sidebar">
+        <?php if (!empty($cv['photo_embed'])): ?>
+            <div class="sidebar-photo-container">
+                <img src="<?= $cv['photo_embed'] ?>" class="preview-photo">
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($cv['competence_nom'])): ?>
+        <div class="section-wrapper">
+            <div class="sidebar-header">Compétences</div>
+            <div class="badge-limit">
+                <?php foreach($cv['competence_nom'] as $i => $nom): if(!empty($nom)): ?>
+                    <span class="badge-item">
+                        <?= htmlspecialchars($nom) ?>
+                        <?= !empty($cv['competence_niveau'][$i]) ? '('.htmlspecialchars($cv['competence_niveau'][$i]).')' : '' ?>
+                    </span>
                 <?php endif; endforeach; ?>
+            </div>
+        </div>
+        <?php endif; ?>
 
-                <div class="section-title">Loisirs</div>
-                <?php foreach ($cv['interet_nom'] as $nom): if(!empty($nom)): ?>
-                    <div style="margin-bottom:5px;">• <?= htmlspecialchars($nom) ?></div>
-                <?php endif; endforeach; ?>
-            </td>
-            <td class="main">
-                <div class="section-title" style="color:#1e272e; border-color:#1e272e;">Résumé</div>
-                <p style="line-height: 1.6;"><?= nl2br(htmlspecialchars($cv['resume'])) ?></p>
+        <?php if (!empty($cv['langue_nom'])): ?>
+        <div class="section-wrapper">
+            <div class="sidebar-header">Langues</div>
+            <?php foreach($cv['langue_nom'] as $i => $nom): if(!empty($nom)): ?>
+                <div class="small" style="margin-bottom:6px">
+                    <strong><?= htmlspecialchars($nom) ?></strong> : <?= htmlspecialchars($cv['langue_niveau'][$i]) ?>
+                </div>
+            <?php endif; endforeach; ?>
+        </div>
+        <?php endif; ?>
+    </aside>
 
-                <div class="section-title" style="color:#1e272e; border-color:#1e272e;">Parcours Professionnel</div>
-                <?php foreach ($cv['experience_titre'] as $i => $titre): if(!empty($titre)): ?>
-                    <div style="margin-bottom:20px; border-left: 3px solid #f1c40f; padding-left:15px;">
-                        <div style="font-weight:bold; font-size:12px;"><?= htmlspecialchars($titre) ?></div>
-                        <div style="color:#666;"><?= htmlspecialchars($cv['experience_etab'][$i]) ?> | <?= htmlspecialchars($cv['experience_debut'][$i]) ?></div>
-                        <p style="margin-top:5px;"><?= nl2br(htmlspecialchars($cv['experience_desc'][$i])) ?></p>
+    <main class="tpl-main">
+        <?php if (!empty($cv['resume'])): ?>
+        <div class="section-wrapper">
+            <div class="section-header">Profil</div>
+            <div class="small" style="white-space: pre-line; text-align: justify;">
+                <?= htmlspecialchars($cv['resume']) ?>
+            </div>
+        </div>
+        <?php endif; ?>
+
+        <?php if (!empty($cv['experience_titre'])): ?>
+        <div class="section-wrapper">
+            <div class="section-header">Expériences</div>
+            <?php foreach($cv['experience_titre'] as $i => $titre): if(!empty($titre)): ?>
+                <div style="margin-bottom: 15px;">
+                    <div class="fw-bold" style="font-size:0.9rem; color: #333;"><?= htmlspecialchars($titre) ?></div>
+                    <div class="text-muted" style="margin-bottom: 4px; font-style: italic;">
+                        <?= htmlspecialchars($cv['experience_etab'][$i] ?? '') ?> | 
+                        <?= htmlspecialchars($cv['experience_debut'][$i] ?? '') ?> - <?= htmlspecialchars($cv['experience_fin'][$i] ?? '') ?>
                     </div>
-                <?php endif; endforeach; ?>
+                    <div class="small" style="white-space: pre-line;"><?= htmlspecialchars($cv['experience_desc'][$i] ?? '') ?></div>
+                </div>
+            <?php endif; endforeach; ?>
+        </div>
+        <?php endif; ?>
 
-                <div class="section-title" style="color:#1e272e; border-color:#1e272e;">Diplômes</div>
-                <?php foreach ($cv['formation_titre'] as $i => $titre): if(!empty($titre)): ?>
-                    <p><strong><?= htmlspecialchars($titre) ?></strong> - <?= htmlspecialchars($cv['formation_etab'][$i]) ?> (<?= htmlspecialchars($cv['formation_fin'][$i]) ?>)</p>
+        <?php if (!empty($cv['formation_titre'])): ?>
+        <div class="section-wrapper">
+            <div class="section-header">Formations</div>
+            <?php foreach($cv['formation_titre'] as $i => $titre): if(!empty($titre)): ?>
+                <div style="margin-bottom: 12px;">
+                    <div class="fw-bold" style="font-size:0.9rem;"><?= htmlspecialchars($titre) ?></div>
+                    <div class="text-muted" style="margin-bottom: 2px;">
+                        <?= htmlspecialchars($cv['formation_etab'][$i] ?? '') ?> | <?= htmlspecialchars($cv['formation_debut'][$i] ?? '') ?> - <?= htmlspecialchars($cv['formation_fin'][$i] ?? '') ?>
+                    </div>
+                    <?php if(!empty($cv['formation_desc'][$i])): ?>
+                        <div class="small" style="white-space: pre-line;"><?= htmlspecialchars($cv['formation_desc'][$i]) ?></div>
+                    <?php endif; ?>
+                </div>
+            <?php endif; endforeach; ?>
+        </div>
+        <?php endif; ?>
+
+        <?php if (!empty($cv['interet_nom'])): ?>
+        <div class="section-wrapper">
+            <div class="section-header">Centres d'intérêt</div>
+            <div class="badge-limit">
+                <?php foreach($cv['interet_nom'] as $nom): if(!empty($nom)): ?>
+                    <span class="badge-item"><?= htmlspecialchars($nom) ?></span>
                 <?php endif; endforeach; ?>
-            </td>
-        </tr>
-    </table>
+            </div>
+        </div>
+        <?php endif; ?>
+    </main>
+</div>
+
 </body>
 </html>
