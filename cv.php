@@ -278,6 +278,9 @@ $tpl_id = $_GET['tpl'] ?? '1';
         <header class="d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold">CV GEN <small class="fw-normal opacity-50">| Editeur</small></h5>
             <div class="d-flex gap-2">
+                <button type="button" onclick="window.location.reload();" class="btn btn-sm btn-light text-dark fw-bold">
+                    ⟳ Réinitialiser
+                </button>
                 <a href="modeles.php" class="btn btn-sm btn-outline-info">Voir les modèles</a>
                 <a href="index.html" class="btn btn-sm btn-outline-light">Retour Accueil</a>
             </div>
@@ -420,7 +423,6 @@ $tpl_id = $_GET['tpl'] ?? '1';
             const header = document.getElementById('area-header');
             const sidebarId = document.getElementById('area-sidebar-identity');
             
-            // On enlève toutes les classes template et on met la nouvelle
             sheet.classList.remove('template-1', 'template-2', 'template-3', 'template-4');
             sheet.classList.add('template-' + val);
             
@@ -514,7 +516,6 @@ $tpl_id = $_GET['tpl'] ?? '1';
             }
         }
 
-        // Lancement au chargement
         window.onload = () => { 
             updateTemplate(); 
             autoZoom();
