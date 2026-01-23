@@ -1,6 +1,9 @@
 <?php 
-//Récupération de l'id du template quand on arrive de modeles.php et que l'on a choisi un template en particulier 
-$tpl_id = $_GET['tpl'] ?? '1'; 
+// 1. SÉCURITÉ : Validation de l'ID du template (chiffre uniquement, défaut à 1)
+$tpl_id = filter_input(INPUT_GET, 'tpl', FILTER_VALIDATE_INT) ?: 1;
+if (!in_array($tpl_id, [1, 2, 3, 4])) {
+    $tpl_id = 1;
+}
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -11,6 +14,7 @@ $tpl_id = $_GET['tpl'] ?? '1';
 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         /* --- CONFIGURATION INTERFACE --- */
@@ -80,6 +84,29 @@ $tpl_id = $_GET['tpl'] ?? '1';
             align-items: center;
             overflow: hidden;
             position: relative;
+        }
+
+        /* --- NOUVEAU DESIGN BOUTON SUPPRIMER --- */
+        .btn-remove-block {
+            background: #fff;
+            color: #adb5bd;
+            border: 1px solid #dee2e6;
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-remove-block:hover {
+            background: #fff5f5;
+            color: #e03131;
+            border-color: #ffa8a8;
+            box-shadow: 0 2px 5px rgba(224, 49, 49, 0.1);
         }
 
         /* --- STRUCTURE CV --- */
@@ -270,6 +297,16 @@ $tpl_id = $_GET['tpl'] ?? '1';
         {
             color: var(--main-color) !important;
         }
+
+        /* --- VALIDATION BOOTSTRAP avec les petis icones V ou X quand on submit le formulaire --- */
+        .was-validated .form-control:invalid {
+            border-color: #dc3545;
+            padding-right: calc(1.5em + 0.75rem);
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right calc(0.375em + 0.1875rem) center;
+            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
     </style>
 </head>
 <body>
@@ -288,14 +325,14 @@ $tpl_id = $_GET['tpl'] ?? '1';
 
         <main class="editor-zone">
             <div class="form-column">
-                <form action="export.php" method="POST" id="cvForm" enctype="multipart/form-data">
+                <form action="export.php" method="POST" id="cvForm" enctype="multipart/form-data" novalidate>
                     <div class="card p-3 border-primary border">
                         <label class="fw-bold mb-2">Modèle & Contraste</label>
                         <select name="template_id" id="templateSelector" class="form-select" onchange="updateTemplate()">
-                            <option value="1" <?php echo ($tpl_id == '1') ? 'selected' : ''; ?>>Modèle Bleu Royal (Classique)</option>
-                            <option value="2" <?php echo ($tpl_id == '2') ? 'selected' : ''; ?>>Modèle Vert Émeraude (Inversé)</option>
-                            <option value="3" <?php echo ($tpl_id == '3') ? 'selected' : ''; ?>>Modèle Ultra Violet (Moderne)</option>
-                            <option value="4" <?php echo ($tpl_id == '4') ? 'selected' : ''; ?>>Modèle Midnight & Gold (Premium)</option>
+                            <option value="1" <?php echo ($tpl_id == 1) ? 'selected' : ''; ?>>Modèle Bleu Royal (Classique)</option>
+                            <option value="2" <?php echo ($tpl_id == 2) ? 'selected' : ''; ?>>Modèle Vert Émeraude (Inversé)</option>
+                            <option value="3" <?php echo ($tpl_id == 3) ? 'selected' : ''; ?>>Modèle Ultra Violet (Moderne)</option>
+                            <option value="4" <?php echo ($tpl_id == 4) ? 'selected' : ''; ?>>Modèle Midnight & Gold (Premium)</option>
                         </select>
                     </div>
 
@@ -303,12 +340,12 @@ $tpl_id = $_GET['tpl'] ?? '1';
                         <h6 class="fw-bold mb-3 text-primary">Photo & Identité</h6>
                         <div class="row g-3">
                             <div class="col-12"><input type="file" name="photo" class="form-control form-control-sm" accept="image/*" onchange="previewImage(this)"></div>
-                            <div class="col-6"><input type="text" name="prenom" class="form-control form-control-sm" placeholder="Prénom" oninput="liveUpdate()"></div>
-                            <div class="col-6"><input type="text" name="nom" class="form-control form-control-sm" placeholder="Nom" oninput="liveUpdate()"></div>
-                            <div class="col-12"><input type="text" name="titre" class="form-control form-control-sm" placeholder="Titre professionnel" oninput="liveUpdate()"></div>
-                            <div class="col-6"><input type="email" name="email" class="form-control form-control-sm" placeholder="Email" oninput="liveUpdate()"></div>
-                            <div class="col-6"><input type="text" name="telephone" class="form-control form-control-sm" placeholder="Téléphone" oninput="liveUpdate()"></div>
-                            <div class="col-12"><textarea name="resume" class="form-control form-control-sm" rows="3" placeholder="Résumé professionnel..." oninput="liveUpdate()"></textarea></div>
+                            <div class="col-6"><input type="text" name="prenom" class="form-control form-control-sm" placeholder="Prénom" oninput="liveUpdate()" required></div>
+                            <div class="col-6"><input type="text" name="nom" class="form-control form-control-sm" placeholder="Nom" oninput="liveUpdate()" required></div>
+                            <div class="col-12"><input type="text" name="titre" class="form-control form-control-sm" placeholder="Titre professionnel" oninput="liveUpdate()" required></div>
+                            <div class="col-6"><input type="email" name="email" class="form-control form-control-sm" placeholder="Email" oninput="liveUpdate()" required></div>
+                            <div class="col-6"><input type="text" name="telephone" class="form-control form-control-sm" placeholder="Téléphone" oninput="liveUpdate()" required></div>
+                            <div class="col-12"><textarea name="resume" class="form-control form-control-sm" rows="3" placeholder="Résumé professionnel..." oninput="liveUpdate()" required></textarea></div>
                         </div>
                     </div>
 
@@ -408,6 +445,14 @@ $tpl_id = $_GET['tpl'] ?? '1';
     </div>
 
     <script>
+        // SÉCURITÉ !!!!! pour empêcher les injections HTML lors de la prévisualisation parce que c'est pas drôle
+        function escapeHtml(text) 
+        {
+            const div = document.createElement('div');
+            div.textContent = text || "";
+            return div.innerHTML;
+        }
+
         function autoZoom() 
         {
             const container = document.getElementById('previewContainer');
@@ -445,17 +490,21 @@ $tpl_id = $_GET['tpl'] ?? '1';
             const container = document.getElementById('container-' + type);
             const id = "id_" + Date.now();
             let html = '';
+            
+            // On définit le bouton supprimer avec la nouvelle icône corbeille
+            const removeBtn = `<button type="button" class="btn-remove-block" onclick="removeBlock('${id}')"><i class="fa-solid fa-trash-can"></i></button>`;
+            
             if (type === 'competence' || type === 'langue') 
             {
-                html = `<div class="row g-2 mb-2" id="${id}"><div class="col-6"><input type="text" name="${type}_nom[]" class="form-control form-control-sm" placeholder="${type}" oninput="liveUpdate()"></div><div class="col-4"><input type="text" name="${type}_niveau[]" class="form-control form-control-sm" placeholder="Niveau" oninput="liveUpdate()"></div><div class="col-2"><button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="removeBlock('${id}')">x</button></div></div>`;
+                html = `<div class="row g-2 mb-2 align-items-center" id="${id}"><div class="col-5"><input type="text" name="${type}_nom[]" class="form-control form-control-sm" placeholder="${type}" oninput="liveUpdate()" required></div><div class="col-5"><input type="text" name="${type}_niveau[]" class="form-control form-control-sm" placeholder="Niveau" oninput="liveUpdate()" required></div><div class="col-2 d-flex justify-content-end">${removeBtn}</div></div>`;
             } 
             else if (type === 'interet') 
             {
-                html = `<div class="row g-2 mb-2" id="${id}"><div class="col-10"><input type="text" name="interet_nom[]" class="form-control form-control-sm" placeholder="Activité" oninput="liveUpdate()"></div><div class="col-2"><button type="button" class="btn btn-outline-danger btn-sm w-100" onclick="removeBlock('${id}')">x</button></div></div>`;
+                html = `<div class="row g-2 mb-2 align-items-center" id="${id}"><div class="col-10"><input type="text" name="interet_nom[]" class="form-control form-control-sm" placeholder="Activité" oninput="liveUpdate()" required></div><div class="col-2 d-flex justify-content-end">${removeBtn}</div></div>`;
             } 
             else 
             {
-                html = `<div class="dynamic-block" id="${id}"><button type="button" class="btn-close btn-sm position-absolute top-0 end-0 m-2" onclick="removeBlock('${id}')"></button><div class="row g-2"><div class="col-6"><input type="text" name="${type}_titre[]" class="form-control form-control-sm fw-bold" placeholder="Titre" oninput="liveUpdate()"></div><div class="col-6"><input type="text" name="${type}_etab[]" class="form-control form-control-sm" placeholder="Lieu" oninput="liveUpdate()"></div><div class="col-6"><input type="text" name="${type}_debut[]" class="form-control form-control-sm" placeholder="Début" oninput="liveUpdate()"></div><div class="col-6"><input type="text" name="${type}_fin[]" class="form-control form-control-sm" placeholder="Fin" oninput="liveUpdate()"></div><div class="col-12"><textarea name="${type}_desc[]" class="form-control form-control-sm" rows="2" placeholder="Détails..." oninput="liveUpdate()"></textarea></div></div></div>`;
+                html = `<div class="dynamic-block" id="${id}"><div class="position-absolute top-0 end-0 m-2">${removeBtn}</div><div class="row g-2"><div class="col-6"><input type="text" name="${type}_titre[]" class="form-control form-control-sm fw-bold" placeholder="Titre" oninput="liveUpdate()" required></div><div class="col-6"><input type="text" name="${type}_etab[]" class="form-control form-control-sm" placeholder="Lieu" oninput="liveUpdate()" required></div><div class="col-6"><input type="text" name="${type}_debut[]" class="form-control form-control-sm" placeholder="Début" oninput="liveUpdate()" required></div><div class="col-6"><input type="text" name="${type}_fin[]" class="form-control form-control-sm" placeholder="Fin" oninput="liveUpdate()" required></div><div class="col-12"><textarea name="${type}_desc[]" class="form-control form-control-sm" rows="2" placeholder="Détails..." oninput="liveUpdate()" required></textarea></div></div></div>`;
             }
             container.insertAdjacentHTML('beforeend', html);
         }
@@ -470,11 +519,13 @@ $tpl_id = $_GET['tpl'] ?? '1';
         {
             const f = new FormData(document.getElementById('cvForm'));
             const name = (f.get('prenom') + ' ' + f.get('nom')).trim().toUpperCase() || "PRÉNOM NOM";
-            document.querySelectorAll('#view-name').forEach(el => el.innerText = name);
-            document.querySelectorAll('#view-titre').forEach(el => el.innerText = f.get('titre') || "TITRE PROFESSIONNEL");
-            const contactHtml = (f.get('email') ? `<div>${f.get('email')}</div>` : '') + (f.get('telephone') ? `<div>${f.get('telephone')}</div>` : '');
+            
+            document.querySelectorAll('#view-name').forEach(el => el.textContent = name);
+            document.querySelectorAll('#view-titre').forEach(el => el.textContent = f.get('titre') || "TITRE PROFESSIONNEL");
+            
+            const contactHtml = (f.get('email') ? `<div>${escapeHtml(f.get('email'))}</div>` : '') + (f.get('telephone') ? `<div>${escapeHtml(f.get('telephone'))}</div>` : '');
             document.querySelectorAll('#view-contact').forEach(el => el.innerHTML = contactHtml);
-            document.getElementById('view-resume').innerText = f.get('resume');
+            document.getElementById('view-resume').textContent = f.get('resume');
 
             ['experience', 'formation'].forEach(type => 
             {
@@ -484,25 +535,27 @@ $tpl_id = $_GET['tpl'] ?? '1';
                       d = document.getElementsByName(type+'_debut[]'), 
                       fn = document.getElementsByName(type+'_fin[]'), 
                       ds = document.getElementsByName(type+'_desc[]');
-                for(let i=0; i<t.length; i++) if(t[i].value) h += `<div class="block-item"><div class='fw-bold' style='font-size:0.9rem'>${t[i].value}</div><div class='text-muted small'>${e[i].value} | ${d[i].value} - ${fn[i].value}</div><div class='mt-1' style='font-size:0.75rem; white-space: pre-line;'>${ds[i].value}</div></div>`;
+                for(let i=0; i<t.length; i++) {
+                    if(t[i].value) h += `<div class="block-item"><div class='fw-bold' style='font-size:0.9rem'>${escapeHtml(t[i].value)}</div><div class='text-muted small'>${escapeHtml(e[i].value)} | ${escapeHtml(d[i].value)} - ${escapeHtml(fn[i].value)}</div><div class='mt-1' style='font-size:0.75rem; white-space: pre-line;'>${escapeHtml(ds[i].value)}</div></div>`;
+                }
                 document.getElementById('view-'+type).innerHTML = h;
             });
 
             let cH = ''; 
             const cN = document.getElementsByName('competence_nom[]'), 
                   cL = document.getElementsByName('competence_niveau[]');
-            for(let i=0; i<cN.length; i++) if(cN[i].value) cH += `<span class='badge-item'>${cN[i].value}${cL[i].value ? ' ('+cL[i].value+')' : ''}</span>`;
+            for(let i=0; i<cN.length; i++) if(cN[i].value) cH += `<span class='badge-item'>${escapeHtml(cN[i].value)}${cL[i].value ? ' ('+escapeHtml(cL[i].value)+')' : ''}</span>`;
             document.getElementById('view-competence').innerHTML = cH;
 
             let lH = ''; 
             const lN = document.getElementsByName('langue_nom[]'), 
                   lV = document.getElementsByName('langue_niveau[]');
-            for(let i=0; i<lN.length; i++) if(lN[i].value) lH += `<div style="margin-bottom:5px"><strong>${lN[i].value}</strong> : ${lV[i].value}</div>`;
+            for(let i=0; i<lN.length; i++) if(lN[i].value) lH += `<div style="margin-bottom:5px"><strong>${escapeHtml(lN[i].value)}</strong> : ${escapeHtml(lV[i].value)}</div>`;
             document.getElementById('view-langue').innerHTML = lH;
 
             let iH = ''; 
             const iN = document.getElementsByName('interet_nom[]');
-            for(let i=0; i<iN.length; i++) if(iN[i].value) iH += `<span class='badge-item'>${iN[i].value}</span>`;
+            for(let i=0; i<iN.length; i++) if(iN[i].value) iH += `<span class='badge-item'>${escapeHtml(iN[i].value)}</span>`;
             document.getElementById('view-interet').innerHTML = iH;
         }
 
@@ -515,6 +568,17 @@ $tpl_id = $_GET['tpl'] ?? '1';
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        // Gestion de la validation Bootstrap pour le submit du CV
+        document.getElementById('cvForm').addEventListener('submit', function (event) 
+        {
+            if (!this.checkValidity()) 
+            {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            this.classList.add('was-validated');
+        }, false);
 
         window.onload = () => { 
             updateTemplate(); 
