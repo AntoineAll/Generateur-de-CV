@@ -1,8 +1,12 @@
 <?php 
-$tpl_id = filter_input(INPUT_GET, 'tpl', FILTER_VALIDATE_INT) ?: 1;
+// Récupération du template choisi dans modeles.php 
+$tpl_id = $_POST['template_id'] ?? ($_GET['tpl'] ?? 1);
 if (!in_array($tpl_id, [1, 2, 3, 4])) {
     $tpl_id = 1;
 }
+
+// On stocke des données déjà générer en POST provenant de account.php 
+$d = $_POST;
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -297,8 +301,8 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
             color: var(--main-color) !important;
         }
 
-        /* --- VALIDATION BOOTSTRAP avec les petis icones V ou X quand on submit le formulaire --- */
-        .was-validated .form-control:invalid {
+        .was-validated .form-control:invalid 
+        {
             border-color: #dc3545;
             padding-right: calc(1.5em + 0.75rem);
             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
@@ -307,7 +311,6 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
         }
 
-        /* Support des retours à la ligne pour le résumé */
         #view-resume {
             white-space: pre-line;
         }
@@ -319,7 +322,7 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
         <header class="d-flex justify-content-between align-items-center">
             <h5 class="mb-0 fw-bold">CV GEN <small class="fw-normal opacity-50">| Editeur</small></h5>
             <div class="d-flex gap-2">
-                <button type="button" onclick="window.location.reload();" class="btn btn-sm btn-light text-dark fw-bold">
+                <button type="button" onclick="window.location.href='cv.php?tpl=<?php echo $tpl_id; ?>';" class="btn btn-sm btn-light text-dark fw-bold">
                     ⟳ Réinitialiser
                 </button>
                 <a href="modeles.php" class="btn btn-sm btn-outline-info">Voir les modèles</a>
@@ -344,12 +347,12 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
                         <h6 class="fw-bold mb-3 text-primary">Photo & Identité</h6>
                         <div class="row g-3">
                             <div class="col-12"><input type="file" name="photo" class="form-control form-control-sm" accept="image/*" onchange="previewImage(this)"></div>
-                            <div class="col-6"><input type="text" name="prenom" class="form-control form-control-sm" placeholder="Prénom" oninput="liveUpdate()" required></div>
-                            <div class="col-6"><input type="text" name="nom" class="form-control form-control-sm" placeholder="Nom" oninput="liveUpdate()" required></div>
-                            <div class="col-12"><input type="text" name="titre" class="form-control form-control-sm" placeholder="Titre professionnel" oninput="liveUpdate()" required></div>
-                            <div class="col-6"><input type="email" name="email" class="form-control form-control-sm" placeholder="Email" oninput="liveUpdate()" required></div>
-                            <div class="col-6"><input type="text" name="telephone" class="form-control form-control-sm" placeholder="Téléphone" oninput="liveUpdate()" required></div>
-                            <div class="col-12"><textarea name="resume" class="form-control form-control-sm" rows="3" placeholder="Résumé professionnel..." oninput="liveUpdate()" required></textarea></div>
+                            <div class="col-6"><input type="text" name="prenom" class="form-control form-control-sm" placeholder="Prénom" value="<?php echo htmlspecialchars($d['prenom'] ?? ''); ?>" oninput="liveUpdate()" required></div>
+                            <div class="col-6"><input type="text" name="nom" class="form-control form-control-sm" placeholder="Nom" value="<?php echo htmlspecialchars($d['nom'] ?? ''); ?>" oninput="liveUpdate()" required></div>
+                            <div class="col-12"><input type="text" name="titre" class="form-control form-control-sm" placeholder="Titre professionnel" value="<?php echo htmlspecialchars($d['titre'] ?? ''); ?>" oninput="liveUpdate()" required></div>
+                            <div class="col-6"><input type="email" name="email" class="form-control form-control-sm" placeholder="Email" value="<?php echo htmlspecialchars($d['email'] ?? ''); ?>" oninput="liveUpdate()" required></div>
+                            <div class="col-6"><input type="text" name="telephone" class="form-control form-control-sm" placeholder="Téléphone" value="<?php echo htmlspecialchars($d['telephone'] ?? ''); ?>" oninput="liveUpdate()" required></div>
+                            <div class="col-12"><textarea name="resume" class="form-control form-control-sm" rows="3" placeholder="Résumé professionnel..." oninput="liveUpdate()" required><?php echo htmlspecialchars($d['resume'] ?? ''); ?></textarea></div>
                         </div>
                     </div>
 
@@ -449,7 +452,6 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
     </div>
 
     <script>
-        // SÉCURITÉ !!!!! pour empêcher les injections HTML lors de la prévisualisation parce que c'est pas drôle
         function escapeHtml(text) 
         {
             if (!text) return "";
@@ -490,76 +492,75 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
             liveUpdate();
         }
 
-        function addBlock(type) 
+        function addBlock(type, data = null) 
         {
             const container = document.getElementById('container-' + type);
-            const id = "id_" + Date.now();
+            const id = "id_" + Math.random().toString(36).substr(2, 9);
             let html = '';
             
             const removeBtn = `<button type="button" class="btn-remove-block" onclick="removeBlock('${id}')"><i class="fa-solid fa-trash-can"></i></button>`;
             
             if (type === 'competence' || type === 'langue') 
             {
-                html = `<div class="row g-2 mb-2 align-items-center" id="${id}"><div class="col-5"><input type="text" name="${type}_nom[]" class="form-control form-control-sm" placeholder="${type}" oninput="liveUpdate()" required></div><div class="col-5"><input type="text" name="${type}_niveau[]" class="form-control form-control-sm" placeholder="Niveau" oninput="liveUpdate()" required></div><div class="col-2 d-flex justify-content-end">${removeBtn}</div></div>`;
+                html = `<div class="row g-2 mb-2 align-items-center" id="${id}">
+                    <div class="col-5"><input type="text" name="${type}_nom[]" class="form-control form-control-sm" placeholder="${type}" value="${escapeHtml(data?.nom || '')}" oninput="liveUpdate()" required></div>
+                    <div class="col-5"><input type="text" name="${type}_niveau[]" class="form-control form-control-sm" placeholder="Niveau" value="${escapeHtml(data?.niveau || '')}" oninput="liveUpdate()" required></div>
+                    <div class="col-2 d-flex justify-content-end">${removeBtn}</div>
+                </div>`;
             } 
             else if (type === 'interet') 
             {
-                html = `<div class="row g-2 mb-2 align-items-center" id="${id}"><div class="col-10"><input type="text" name="interet_nom[]" class="form-control form-control-sm" placeholder="Activité" oninput="liveUpdate()" required></div><div class="col-2 d-flex justify-content-end">${removeBtn}</div></div>`;
+                html = `<div class="row g-2 mb-2 align-items-center" id="${id}">
+                    <div class="col-10"><input type="text" name="interet_nom[]" class="form-control form-control-sm" placeholder="Activité" value="${escapeHtml(data?.nom || '')}" oninput="liveUpdate()" required></div>
+                    <div class="col-2 d-flex justify-content-end">${removeBtn}</div>
+                </div>`;
             } 
             else 
             {
-                html = `<div class="dynamic-block" id="${id}"><div class="position-absolute top-0 end-0 m-2">${removeBtn}</div><div class="row g-2"><div class="col-6"><input type="text" name="${type}_titre[]" class="form-control form-control-sm fw-bold" placeholder="Titre" oninput="liveUpdate()" required></div><div class="col-6"><input type="text" name="${type}_etab[]" class="form-control form-control-sm" placeholder="Lieu" oninput="liveUpdate()" required></div><div class="col-6"><input type="text" name="${type}_debut[]" class="form-control form-control-sm" placeholder="Début" oninput="liveUpdate()" required></div><div class="col-6"><input type="text" name="${type}_fin[]" class="form-control form-control-sm" placeholder="Fin" oninput="liveUpdate()" required></div><div class="col-12"><textarea name="${type}_desc[]" class="form-control form-control-sm" rows="2" placeholder="Détails..." oninput="liveUpdate()" required></textarea></div></div></div>`;
+                html = `<div class="dynamic-block" id="${id}">
+                    <div class="position-absolute top-0 end-0 m-2">${removeBtn}</div>
+                    <div class="row g-2">
+                        <div class="col-6"><input type="text" name="${type}_titre[]" class="form-control form-control-sm fw-bold" placeholder="Titre" value="${escapeHtml(data?.titre || '')}" oninput="liveUpdate()" required></div>
+                        <div class="col-6"><input type="text" name="${type}_etab[]" class="form-control form-control-sm" placeholder="Lieu" value="${escapeHtml(data?.etab || '')}" oninput="liveUpdate()" required></div>
+                        <div class="col-6"><input type="text" name="${type}_debut[]" class="form-control form-control-sm" placeholder="Début" value="${escapeHtml(data?.debut || '')}" oninput="liveUpdate()" required></div>
+                        <div class="col-6"><input type="text" name="${type}_fin[]" class="form-control form-control-sm" placeholder="Fin" value="${escapeHtml(data?.fin || '')}" oninput="liveUpdate()" required></div>
+                        <div class="col-12"><textarea name="${type}_desc[]" class="form-control form-control-sm" rows="2" placeholder="Détails..." oninput="liveUpdate()" required>${escapeHtml(data?.desc || '')}</textarea></div>
+                    </div>
+                </div>`;
             }
             container.insertAdjacentHTML('beforeend', html);
+            liveUpdate();
         }
 
-        function removeBlock(id) 
-        { 
-            document.getElementById(id).remove(); 
-            liveUpdate(); 
-        }
+        function removeBlock(id) { document.getElementById(id).remove(); liveUpdate(); }
 
         function liveUpdate() 
         {
             const f = new FormData(document.getElementById('cvForm'));
-            
             const name = (f.get('prenom') + ' ' + f.get('nom')).trim().toUpperCase() || "PRÉNOM NOM";
             document.querySelectorAll('#view-name').forEach(el => el.textContent = name);
             document.querySelectorAll('#view-titre').forEach(el => el.textContent = f.get('titre') || "TITRE PROFESSIONNEL");
             
             const contactHtml = (f.get('email') ? `<div>${escapeHtml(f.get('email'))}</div>` : '') + (f.get('telephone') ? `<div>${escapeHtml(f.get('telephone'))}</div>` : '');
             document.querySelectorAll('#view-contact').forEach(el => el.innerHTML = contactHtml);
-            
             document.querySelectorAll('#view-resume').forEach(el => el.innerHTML = escapeHtml(f.get('resume')));
 
-            ['experience', 'formation'].forEach(type => 
-            {
+            ['experience', 'formation'].forEach(type => {
                 let h = '';
-                const t = document.getElementsByName(type+'_titre[]'), 
-                      e = document.getElementsByName(type+'_etab[]'), 
-                      d = document.getElementsByName(type+'_debut[]'), 
-                      fn = document.getElementsByName(type+'_fin[]'), 
-                      ds = document.getElementsByName(type+'_desc[]');
-                for(let i=0; i<t.length; i++) {
-                    if(t[i].value) h += `<div class="block-item"><div class='fw-bold' style='font-size:0.9rem'>${escapeHtml(t[i].value)}</div><div class='text-muted small'>${escapeHtml(e[i].value)} | ${escapeHtml(d[i].value)} - ${escapeHtml(fn[i].value)}</div><div class='mt-1' style='font-size:0.75rem; white-space: pre-line;'>${escapeHtml(ds[i].value)}</div></div>`;
-                }
+                const t = document.getElementsByName(type+'_titre[]'), e = document.getElementsByName(type+'_etab[]'), d = document.getElementsByName(type+'_debut[]'), fn = document.getElementsByName(type+'_fin[]'), ds = document.getElementsByName(type+'_desc[]');
+                for(let i=0; i<t.length; i++) if(t[i].value) h += `<div class="block-item"><div class='fw-bold' style='font-size:0.9rem'>${escapeHtml(t[i].value)}</div><div class='text-muted small'>${escapeHtml(e[i].value)} | ${escapeHtml(d[i].value)} - ${escapeHtml(fn[i].value)}</div><div class='mt-1' style='font-size:0.75rem; white-space: pre-line;'>${escapeHtml(ds[i].value)}</div></div>`;
                 document.getElementById('view-'+type).innerHTML = h;
             });
 
-            let cH = ''; 
-            const cN = document.getElementsByName('competence_nom[]'), 
-                  cL = document.getElementsByName('competence_niveau[]');
+            let cH = ''; const cN = document.getElementsByName('competence_nom[]'), cL = document.getElementsByName('competence_niveau[]');
             for(let i=0; i<cN.length; i++) if(cN[i].value) cH += `<span class='badge-item'>${escapeHtml(cN[i].value)}${cL[i].value ? ' ('+escapeHtml(cL[i].value)+')' : ''}</span>`;
             document.getElementById('view-competence').innerHTML = cH;
 
-            let lH = ''; 
-            const lN = document.getElementsByName('langue_nom[]'), 
-                  lV = document.getElementsByName('langue_niveau[]');
+            let lH = ''; const lN = document.getElementsByName('langue_nom[]'), lV = document.getElementsByName('langue_niveau[]');
             for(let i=0; i<lN.length; i++) if(lN[i].value) lH += `<div style="margin-bottom:5px"><strong>${escapeHtml(lN[i].value)}</strong> : ${escapeHtml(lV[i].value)}</div>`;
             document.getElementById('view-langue').innerHTML = lH;
 
-            let iH = ''; 
-            const iN = document.getElementsByName('interet_nom[]');
+            let iH = ''; const iN = document.getElementsByName('interet_nom[]');
             for(let i=0; i<iN.length; i++) if(iN[i].value) iH += `<span class='badge-item'>${escapeHtml(iN[i].value)}</span>`;
             document.getElementById('view-interet').innerHTML = iH;
         }
@@ -574,20 +575,49 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
             }
         }
 
-        /* --- VALIDATION BOOTSTRAP avec les petis icones V ou X quand on submit le formulaire --- */
-        document.getElementById('cvForm').addEventListener('submit', function (event) 
-        {
-            if (!this.checkValidity()) 
+        // --- Chargement des données du CV déjà générer précédemment qui sont dans l'historique ---
+        window.onload = () => 
+        { 
+            <?php
+            if(!empty($d['experience_titre'])) 
             {
-                event.preventDefault();
-                event.stopPropagation();
+                foreach($d['experience_titre'] as $i => $t) 
+                {
+                    echo "addBlock('experience', {titre:'$t', etab:'{$d['experience_etab'][$i]}', debut:'{$d['experience_debut'][$i]}', fin:'{$d['experience_fin'][$i]}', desc:'".str_replace(["\r","\n"],['','\n'],$d['experience_desc'][$i])."'});";
+                }
             }
-            this.classList.add('was-validated');
-        }, false);
-
-        window.onload = () => { 
+            if(!empty($d['formation_titre'])) 
+            {
+                foreach($d['formation_titre'] as $i => $t) 
+                {
+                    echo "addBlock('formation', {titre:'$t', etab:'{$d['formation_etab'][$i]}', debut:'{$d['formation_debut'][$i]}', fin:'{$d['formation_fin'][$i]}', desc:'".str_replace(["\r","\n"],['','\n'],$d['formation_desc'][$i])."'});";
+                }
+            }
+            if(!empty($d['competence_nom']))
+                {
+                foreach($d['competence_nom'] as $i => $n)
+                {
+                    echo "addBlock('competence', {nom:'$n', niveau:'{$d['competence_niveau'][$i]}'});";
+                }
+            }
+            if(!empty($d['langue_nom']))
+            {
+                foreach($d['langue_nom'] as $i => $n) 
+                {
+                    echo "addBlock('langue', {nom:'$n', niveau:'{$d['langue_niveau'][$i]}'});";
+                }
+            }
+            if(!empty($d['interet_nom'])) 
+            {
+                foreach($d['interet_nom'] as $n)
+                {
+                    echo "addBlock('interet', {nom:'$n'});";
+                }
+            }
+            ?>
             updateTemplate(); 
             autoZoom();
+            liveUpdate();
         };
         window.onresize = autoZoom;
     </script>
