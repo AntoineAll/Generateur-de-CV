@@ -1,5 +1,4 @@
 <?php 
-// 1. SÉCURITÉ : Validation de l'ID du template (chiffre uniquement, défaut à 1)
 $tpl_id = filter_input(INPUT_GET, 'tpl', FILTER_VALIDATE_INT) ?: 1;
 if (!in_array($tpl_id, [1, 2, 3, 4])) {
     $tpl_id = 1;
@@ -307,6 +306,11 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
             background-position: right calc(0.375em + 0.1875rem) center;
             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
         }
+
+        /* Support des retours à la ligne pour le résumé */
+        #view-resume {
+            white-space: pre-line;
+        }
     </style>
 </head>
 <body>
@@ -448,8 +452,9 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
         // SÉCURITÉ !!!!! pour empêcher les injections HTML lors de la prévisualisation parce que c'est pas drôle
         function escapeHtml(text) 
         {
+            if (!text) return "";
             const div = document.createElement('div');
-            div.textContent = text || "";
+            div.textContent = text;
             return div.innerHTML;
         }
 
@@ -491,7 +496,6 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
             const id = "id_" + Date.now();
             let html = '';
             
-            // On définit le bouton supprimer avec la nouvelle icône corbeille
             const removeBtn = `<button type="button" class="btn-remove-block" onclick="removeBlock('${id}')"><i class="fa-solid fa-trash-can"></i></button>`;
             
             if (type === 'competence' || type === 'langue') 
@@ -518,14 +522,15 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
         function liveUpdate() 
         {
             const f = new FormData(document.getElementById('cvForm'));
-            const name = (f.get('prenom') + ' ' + f.get('nom')).trim().toUpperCase() || "PRÉNOM NOM";
             
+            const name = (f.get('prenom') + ' ' + f.get('nom')).trim().toUpperCase() || "PRÉNOM NOM";
             document.querySelectorAll('#view-name').forEach(el => el.textContent = name);
             document.querySelectorAll('#view-titre').forEach(el => el.textContent = f.get('titre') || "TITRE PROFESSIONNEL");
             
             const contactHtml = (f.get('email') ? `<div>${escapeHtml(f.get('email'))}</div>` : '') + (f.get('telephone') ? `<div>${escapeHtml(f.get('telephone'))}</div>` : '');
             document.querySelectorAll('#view-contact').forEach(el => el.innerHTML = contactHtml);
-            document.getElementById('view-resume').textContent = f.get('resume');
+            
+            document.querySelectorAll('#view-resume').forEach(el => el.innerHTML = escapeHtml(f.get('resume')));
 
             ['experience', 'formation'].forEach(type => 
             {
@@ -569,7 +574,7 @@ if (!in_array($tpl_id, [1, 2, 3, 4])) {
             }
         }
 
-        // Gestion de la validation Bootstrap pour le submit du CV
+        /* --- VALIDATION BOOTSTRAP avec les petis icones V ou X quand on submit le formulaire --- */
         document.getElementById('cvForm').addEventListener('submit', function (event) 
         {
             if (!this.checkValidity()) 
