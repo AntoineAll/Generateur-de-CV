@@ -2,6 +2,7 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Nos Modèles | CV GEN</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
@@ -18,7 +19,11 @@
             overflow: hidden;
         }
 
-        .template-card:hover { transform: translateY(-10px); }
+        /* Désactiver le survol sur mobile pour éviter les bugs de scroll (les bugs ne sont pas fun)*/
+        @media (min-width: 992px) {
+            .template-card:hover { transform: translateY(-10px); }
+            .template-card:hover img { transform: scale(1.03); }
+        }
 
         .img-container {
             height: 420px;
@@ -29,13 +34,17 @@
             border-bottom: 1px solid #eee;
         }
 
+        /* Ajuster la hauteur de l'aperçu sur mobile pour la lisibilité */
+        @media (max-width: 576px) {
+            .img-container { height: 300px; }
+            .display-6 { font-size: 1.5rem; }
+        }
+
         .img-container img {
             width: 100%;
             height: auto;
             transition: transform 0.5s ease;
         }
-
-        .template-card:hover img { transform: scale(1.03); }
 
         .btn-choose {
             background: var(--grad);
@@ -44,9 +53,15 @@
             font-weight: bold;
             padding: 10px 20px;
             transition: 0.3s;
+            color: white;
         }
         
-        .btn-choose:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-choose:hover { opacity: 0.9; transform: scale(1.02); color: white; }
+
+        /* Gestion du footer pour ne pas cacher le contenu */
+        @media (max-width: 768px) {
+            footer.fixed-bottom { position: relative; margin-top: 40px; }
+        }
     </style>
 </head>
 <body>
@@ -54,16 +69,21 @@
 <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
     <div class="container">
         <a class="navbar-brand fw-bold" href="index.html">CV GEN</a>
-        <div class="navbar-nav ms-auto">
-            <a class="nav-link d-inline-block text-white px-3" href="index.html">Accueil</a>
-            <a class="nav-link d-inline-block text-white px-3 fw-bold" href="modeles.php">Modèles</a>
-            <a class="nav-link d-inline-block text-white px-3" href="contact.php">Contact</a>
-            <a class="nav-link d-inline-block text-white px-3" href="account.php">Mon Compte</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link text-white px-3" href="index.html">Accueil</a>
+                <a class="nav-link text-white px-3 fw-bold active" href="modeles.php">Modèles</a>
+                <a class="nav-link text-white px-3" href="contact.php">Contact</a>
+                <a class="nav-link text-white px-3" href="account.php">Mon Compte</a>
+            </div>
         </div>
     </div>
 </nav>
 
-<div class="container my-5">
+<div class="container my-5 pb-5">
     <div class="text-center mb-5">
         <h2 class="fw-bold display-6">Choisissez votre design</h2>
         <p class="text-muted">Cliquez sur un modèle pour commencer votre personnalisation.</p>
@@ -71,7 +91,6 @@
 
     <div class="row g-4">
         <?php
-        // Config des templates que j'ai
         $templates = [
             1 => ["nom" => "Bleu Royal", "desc" => "Classique & Professionnel"],
             2 => ["nom" => "Vert Émeraude", "desc" => "Moderne & Aéré"],
@@ -80,12 +99,12 @@
         ];
 
         foreach ($templates as $id => $info): ?>
-        <div class="col-md-6 col-lg-3">
+        <div class="col-sm-6 col-lg-3">
             <div class="card template-card h-100">
                 <div class="img-container">
                     <img src="assets/img/tpl<?php echo $id; ?>.png" 
                          alt="Aperçu <?php echo $info['nom']; ?>" 
-                         onerror="this.src='https://via.placeholder.com/400x560?text=Image+PNG+manquante'">
+                         onerror="this.src='https://via.placeholder.com/400x560?text=Aperçu+TPL+<?php echo $id; ?>'">
                 </div>
                 <div class="card-body text-center d-flex flex-column">
                     <h5 class="fw-bold mb-1"><?php echo $info['nom']; ?></h5>
@@ -106,5 +125,6 @@
     </div>
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

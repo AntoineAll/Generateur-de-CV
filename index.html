@@ -18,12 +18,20 @@
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
             padding: 100px 0;
-            clip-path: ellipse(150% 100% at 50% 0%); /* Petit effet de courbe en bas */
+            clip-path: ellipse(150% 100% at 50% 0%);
         }
 
         .navbar {
             background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px); /* Effet flou derrière le menu */
+            backdrop-filter: blur(10px);
+            transition: background 0.3s;
+        }
+
+        /* Style pour le menu mobile quand il est ouvert */
+        @media (max-width: 991px) {
+            .navbar {
+                background: #764ba2;
+            }
         }
 
         .btn-modern {
@@ -34,7 +42,7 @@
         }
 
         .btn-modern:hover {
-            transform: translateY(-3px); /* Le bouton monte un peu au survol */
+            transform: translateY(-3px);
         }
 
         .feature-card {
@@ -47,6 +55,19 @@
         .feature-card:hover {
             box-shadow: 0 15px 40px rgba(0,0,0,0.1);
         }
+
+        /* Partie Responsive*/
+        @media (max-width: 768px) {
+            .hero-section h1 {
+                font-size: 2rem; 
+            }
+            .hero-section {
+                padding: 80px 20px;
+            }
+            footer.fixed-bottom {
+                position: relative;
+            }
+        }
     </style>
 </head>
 <body>
@@ -54,19 +75,24 @@
     <nav class="navbar navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
             <a class="navbar-brand fw-bold" href="index.php">CV GEN</a>
-            <div class="navbar-nav ms-auto">
-                <a href="cv.php" class="nav-link d-inline-block text-white px-3">Générer mon CV</a>
-                <a href="modeles.php" class="nav-link d-inline-block text-white px-3">Modèles</a>
-                <a href="contact.php" class="nav-link d-inline-block text-white px-3">Contact</a>
-                <a href="account.php" class="nav-link d-inline-block text-white px-3">Mon Compte</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav ms-auto">
+                    <a href="cv.php" class="nav-link text-white px-3">Générer mon CV</a>
+                    <a href="modeles.php" class="nav-link text-white px-3">Modèles</a>
+                    <a href="contact.php" class="nav-link text-white px-3">Contact</a>
+                    <a href="account.php" class="nav-link text-white px-3">Mon Compte</a>
+                </div>
             </div>
         </div>
     </nav>
 
     <header class="hero-section text-center">
         <div class="container">
-            <h1 class="display-3 fw-bold mb-3">Votre CV professionnel en 5 minutes</h1>
-            <p class="lead mb-5 opacity-75">Concevez, personnalisez et exportez votre CV au format PDF avec un rendu impeccable.</p>
+            <h1 class="display-3 fw-bold mb-3 px-2">Votre CV professionnel en 5 minutes</h1>
+            <p class="lead mb-5 opacity-75 px-3">Concevez, personnalisez et exportez votre CV au format PDF avec un rendu impeccable.</p>
             <a href="cv.php" class="btn btn-light btn-lg btn-modern text-primary shadow">Créer mon CV maintenant</a>
         </div>
     </header>
@@ -97,7 +123,7 @@
         </div>
     </main>
 
-    <footer class="py-3 bg-white border-top fixed-bottom">
+    <footer class="py-3 bg-white border-top mt-5 fixed-bottom">
         <div class="container text-center text-muted">
             <p class="mb-0 small">&copy; 2026 Antoine ALLARD - Tous droits réservés.</p>
         </div>

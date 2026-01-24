@@ -1,11 +1,6 @@
 <?php 
-// Récupération du template choisi dans modeles.php 
 $tpl_id = $_POST['template_id'] ?? ($_GET['tpl'] ?? 1);
-if (!in_array($tpl_id, [1, 2, 3, 4])) {
-    $tpl_id = 1;
-}
-
-// On stocke des données déjà générer en POST provenant de account.php 
+if (!in_array($tpl_id, [1, 2, 3, 4])) { $tpl_id = 1; }
 $d = $_POST;
 ?>
 <!DOCTYPE html>
@@ -21,65 +16,43 @@ $d = $_POST;
 
     <style>
         /* --- CONFIGURATION INTERFACE --- */
-        html, body 
-        {
+        html, body {
             height: 100vh;
             margin: 0;
-            overflow: hidden;
+            overflow: hidden; /* Fixé pour desktop */
             font-family: 'Inter', sans-serif;
             background-color: #f1f3f5;
         }
 
-        .app-container 
-        {
+        .app-container {
             display: flex;
             flex-direction: column;
             height: 100vh;
         }
 
-        header 
-        {
+        header {
             flex-shrink: 0;
             background: #212529;
             color: white;
             padding: 10px 20px;
+            z-index: 100;
         }
 
-        .editor-zone 
-        {
+        .editor-zone {
             display: flex;
             flex-grow: 1;
             overflow: hidden;
         }
 
-        .form-column 
-        {
+        .form-column {
             flex: 0 0 40%;
             overflow-y: auto;
             padding: 25px;
             border-right: 1px solid #dee2e6;
+            background: #fff;
         }
 
-        .card 
-        {
-            border: none;
-            border-radius: 10px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
-        }
-
-        .dynamic-block 
-        {
-            background: #f8f9fa;
-            border: 1px solid #e9ecef;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            position: relative;
-        }
-
-        .preview-column 
-        {
+        .preview-column {
             flex: 0 0 60%;
             background: #525961;
             display: flex;
@@ -89,244 +62,92 @@ $d = $_POST;
             position: relative;
         }
 
-        /* --- NOUVEAU DESIGN BOUTON SUPPRIMER --- */
+        /* --- AJUSTEMENTS MOBILE --- */
+        @media (max-width: 992px) {
+            html, body { overflow: auto; height: auto; }
+            .app-container { height: auto; }
+            .editor-zone { flex-direction: column; overflow: visible; }
+            .form-column, .preview-column { flex: 0 0 100%; width: 100%; }
+            .form-column { border-right: none; padding: 15px; }
+            
+            .preview-column { 
+                padding: 20px 0; 
+                min-height: 100vh; 
+                overflow: visible; 
+                display: block; /* Annule le flex pour éviter le flottement */
+                text-align: center;
+            }
+
+            #cv-sheet {
+                transform-origin: top center !important;
+                margin-top: 0 !important;
+                position: relative !important;
+                top: 0 !important;
+                left: 50% !important;
+                transform: translateX(-50%) scale(1); /* Sera mis à jour par JS */
+            }
+            
+            header .btn-sm { font-size: 0.7rem; padding: 4px 8px; }
+        }
+
+        /* --- STYLE DES COMPOSANTS --- */
+        .card { border: none; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .dynamic-block { background: #f8f9fa; border: 1px solid #e9ecef; border-radius: 8px; padding: 15px; margin-bottom: 15px; position: relative; }
+        
         .btn-remove-block {
-            background: #fff;
-            color: #adb5bd;
-            border: 1px solid #dee2e6;
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            cursor: pointer;
-            font-size: 14px;
+            background: #fff; color: #adb5bd; border: 1px solid #dee2e6;
+            width: 28px; height: 28px; border-radius: 6px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s; cursor: pointer; font-size: 14px;
         }
+        .btn-remove-block:hover { background: #fff5f5; color: #e03131; border-color: #ffa8a8; }
 
-        .btn-remove-block:hover {
-            background: #fff5f5;
-            color: #e03131;
-            border-color: #ffa8a8;
-            box-shadow: 0 2px 5px rgba(224, 49, 49, 0.1);
-        }
-
-        /* --- STRUCTURE CV --- */
-        #cv-sheet 
-        {
+        /* --- STRUCTURE CV (Format A4) --- */
+        #cv-sheet {
             background: white;
             width: 210mm;
             height: 297mm;
             box-shadow: 0 20px 50px rgba(0,0,0,0.4);
-            transform: scale(0.28);
             transform-origin: center center;
             color: #333;
             line-height: 1.4;
             position: relative;
             overflow: hidden;
+            margin: 0 auto;
         }
 
-        .tpl-container 
-        {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            width: 100%;
-        }
-
-        .tpl-sidebar 
-        {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            left: 0;
-            width: 35%;
-            padding: 30px 20px;
-            background: var(--side-bg);
-            color: var(--text-side);
-            box-sizing: border-box;
-        }
-
-        .tpl-main 
-        {
-            position: absolute;
-            top: 0;
-            bottom: 0;
-            right: 0;
-            width: 65%;
-            padding: 35px 40px;
-            box-sizing: border-box;
-            background: #ffffff;
-        }
+        .tpl-container { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; }
+        .tpl-sidebar { position: absolute; top: 0; bottom: 0; left: 0; width: 35%; padding: 30px 20px; background: var(--side-bg); color: var(--text-side); box-sizing: border-box; }
+        .tpl-main { position: absolute; top: 0; bottom: 0; right: 0; width: 65%; padding: 35px 40px; box-sizing: border-box; background: #ffffff; }
 
         /* --- THÈMES --- */
-        .template-1 
-        {
-            --main-color: #004aad;
-            --side-bg: #f8f9fa;
-            --text-side: #212529;
-        }
+        .template-1 { --main-color: #004aad; --side-bg: #f8f9fa; --text-side: #212529; }
+        .template-2 { --main-color: #065f46; --side-bg: #ecfdf5; --text-side: #064e3b; }
+        .template-2 .tpl-sidebar { left: auto; right: 0; }
+        .template-2 .tpl-main { right: auto; left: 0; }
+        .template-3 { --main-color: #6c5ce7; --side-bg: #f3f0ff; --text-side: #2d3436; }
+        .template-4 { --main-color: #f1c40f; --side-bg: #1e272e; --text-side: #ffffff; }
 
-        .template-2 
-        {
-            --main-color: #065f46;
-            --side-bg: #ecfdf5;
-            --text-side: #064e3b;
-        }
+        .tpl-header { position: absolute; top: 0; left: 0; width: 100%; height: 160px; padding: 40px 20px; display: none; box-sizing: border-box; z-index: 10; background: white; }
+        .template-3 .tpl-header { text-align: center; border-bottom: 4px solid var(--main-color); }
+        .template-4 .tpl-header { background: #000; color: #fff; text-align: right; }
+        .template-3 .tpl-sidebar, .template-3 .tpl-main, .template-4 .tpl-sidebar, .template-4 .tpl-main { top: 160px; }
 
-        .template-2 .tpl-sidebar 
-        {
-            left: auto;
-            right: 0;
-        }
-
-        .template-2 .tpl-main 
-        {
-            right: auto;
-            left: 0;
-        }
-
-        .template-3 
-        {
-            --main-color: #6c5ce7;
-            --side-bg: #f3f0ff;
-            --text-side: #2d3436;
-        }
-
-        .template-4 
-        {
-            --main-color: #f1c40f;
-            --side-bg: #1e272e;
-            --text-side: #ffffff;
-        }
-
-        .tpl-header 
-        {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 160px;
-            padding: 40px 20px;
-            display: none;
-            box-sizing: border-box;
-            z-index: 10;
-            background: white;
-        }
-
-        .template-3 .tpl-header 
-        {
-            text-align: center;
-            border-bottom: 4px solid var(--main-color);
-        }
-
-        .template-4 .tpl-header 
-        {
-            background: #000;
-            color: #fff;
-            text-align: right;
-            border: none;
-        }
-
-        .template-3 .tpl-sidebar, 
-        .template-3 .tpl-main,
-        .template-4 .tpl-sidebar, 
-        .template-4 .tpl-main 
-        {
-            top: 160px;
-        }
-
-        /* --- ESPACEMENT ET DESIGN DES SECTIONS --- */
-        .section-wrapper 
-        {
-            margin-bottom: 30px;
-        }
-
-        .section-header 
-        {
-            border-bottom: 2px solid var(--main-color);
-            color: var(--main-color);
-            font-weight: bold;
-            margin-bottom: 15px;
-            padding-bottom: 5px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .block-item 
-        {
-            margin-bottom: 18px;
-        }
-
-        .preview-photo 
-        {
-            width: 125px;
-            height: 125px;
-            border: 3px solid var(--main-color);
-            border-radius: 50%;
-            margin-bottom: 20px;
-            display: none;
-            margin-left: auto;
-            margin-right: auto;
-            object-fit: cover;
-        }
-
-        .badge-item 
-        {
-            display: inline-block;
-            background: #f1f3f5;
-            color: #343a40;
-            border: 1px solid #dee2e6;
-            padding: 4px 10px;
-            border-radius: 4px;
-            margin-right: 6px;
-            margin-bottom: 8px;
-            font-size: 0.72rem;
-            font-weight: 600;
-        }
-
-        .template-4 .badge-item 
-        {
-            background: #34495e;
-            color: #fff;
-            border-color: #4b6584;
-        }
-
-        .text-primary 
-        {
-            color: var(--main-color) !important;
-        }
-
-        .was-validated .form-control:invalid 
-        {
-            border-color: #dc3545;
-            padding-right: calc(1.5em + 0.75rem);
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-            background-repeat: no-repeat;
-            background-position: right calc(0.375em + 0.1875rem) center;
-            background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
-        }
-
-        #view-resume {
-            white-space: pre-line;
-        }
+        .section-header { border-bottom: 2px solid var(--main-color); color: var(--main-color); font-weight: bold; margin-bottom: 15px; padding-bottom: 5px; font-size: 0.8rem; text-transform: uppercase; }
+        .preview-photo { width: 125px; height: 125px; border: 3px solid var(--main-color); border-radius: 50%; margin-bottom: 20px; display: none; margin-left: auto; margin-right: auto; object-fit: cover; }
+        .badge-item { display: inline-block; background: #f1f3f5; color: #343a40; border: 1px solid #dee2e6; padding: 4px 10px; border-radius: 4px; margin-right: 6px; margin-bottom: 8px; font-size: 0.72rem; font-weight: 600; }
     </style>
 </head>
 <body>
 
     <div class="app-container">
         <header class="d-flex justify-content-between align-items-center">
-            <h5 class="mb-0 fw-bold">CV GEN <small class="fw-normal opacity-50">| Editeur</small></h5>
-            <div class="d-flex gap-2">
-                <button type="button" onclick="window.location.href='cv.php?tpl=<?php echo $tpl_id; ?>';" class="btn btn-sm btn-light text-dark fw-bold">
-                    ⟳ Réinitialiser
-                </button>
-                <a href="modeles.php" class="btn btn-sm btn-outline-info">Voir les modèles</a>
-                <a href="index.html" class="btn btn-sm btn-outline-light">Retour Accueil</a>
+            <h5 class="mb-0 fw-bold d-none d-sm-block">CV GEN <small class="fw-normal opacity-50">| Editeur</small></h5>
+            <h5 class="mb-0 fw-bold d-block d-sm-none">CV GEN</h5>
+            <div class="d-flex gap-1 gap-md-2">
+                <button type="button" onclick="window.location.href='cv.php?tpl=<?php echo $tpl_id; ?>';" class="btn btn-sm btn-light text-dark fw-bold">⟳ <span class="d-none d-md-inline">Réinitialiser</span></button>
+                <a href="modeles.php" class="btn btn-sm btn-outline-info">Modèles</a>
+                <a href="index.html" class="btn btn-sm btn-outline-light">Quitter</a>
             </div>
         </header>
 
@@ -334,12 +155,12 @@ $d = $_POST;
             <div class="form-column">
                 <form action="export.php" method="POST" id="cvForm" enctype="multipart/form-data" novalidate>
                     <div class="card p-3 border-primary border">
-                        <label class="fw-bold mb-2">Modèle & Contraste</label>
+                        <label class="fw-bold mb-2">Modèle sélectionné</label>
                         <select name="template_id" id="templateSelector" class="form-select" onchange="updateTemplate()">
-                            <option value="1" <?php echo ($tpl_id == 1) ? 'selected' : ''; ?>>Modèle Bleu Royal (Classique)</option>
-                            <option value="2" <?php echo ($tpl_id == 2) ? 'selected' : ''; ?>>Modèle Vert Émeraude (Inversé)</option>
-                            <option value="3" <?php echo ($tpl_id == 3) ? 'selected' : ''; ?>>Modèle Ultra Violet (Moderne)</option>
-                            <option value="4" <?php echo ($tpl_id == 4) ? 'selected' : ''; ?>>Modèle Midnight & Gold (Premium)</option>
+                            <option value="1" <?php echo ($tpl_id == 1) ? 'selected' : ''; ?>>Bleu Royal (Classique)</option>
+                            <option value="2" <?php echo ($tpl_id == 2) ? 'selected' : ''; ?>>Vert Émeraude (Inversé)</option>
+                            <option value="3" <?php echo ($tpl_id == 3) ? 'selected' : ''; ?>>Ultra Violet (Moderne)</option>
+                            <option value="4" <?php echo ($tpl_id == 4) ? 'selected' : ''; ?>>Midnight & Gold (Premium)</option>
                         </select>
                     </div>
 
@@ -350,8 +171,8 @@ $d = $_POST;
                             <div class="col-6"><input type="text" name="prenom" class="form-control form-control-sm" placeholder="Prénom" value="<?php echo htmlspecialchars($d['prenom'] ?? ''); ?>" oninput="liveUpdate()" required></div>
                             <div class="col-6"><input type="text" name="nom" class="form-control form-control-sm" placeholder="Nom" value="<?php echo htmlspecialchars($d['nom'] ?? ''); ?>" oninput="liveUpdate()" required></div>
                             <div class="col-12"><input type="text" name="titre" class="form-control form-control-sm" placeholder="Titre professionnel" value="<?php echo htmlspecialchars($d['titre'] ?? ''); ?>" oninput="liveUpdate()" required></div>
-                            <div class="col-6"><input type="email" name="email" class="form-control form-control-sm" placeholder="Email" value="<?php echo htmlspecialchars($d['email'] ?? ''); ?>" oninput="liveUpdate()" required></div>
-                            <div class="col-6"><input type="text" name="telephone" class="form-control form-control-sm" placeholder="Téléphone" value="<?php echo htmlspecialchars($d['telephone'] ?? ''); ?>" oninput="liveUpdate()" required></div>
+                            <div class="col-12 col-md-6"><input type="email" name="email" class="form-control form-control-sm" placeholder="Email" value="<?php echo htmlspecialchars($d['email'] ?? ''); ?>" oninput="liveUpdate()" required></div>
+                            <div class="col-12 col-md-6"><input type="text" name="telephone" class="form-control form-control-sm" placeholder="Téléphone" value="<?php echo htmlspecialchars($d['telephone'] ?? ''); ?>" oninput="liveUpdate()" required></div>
                             <div class="col-12"><textarea name="resume" class="form-control form-control-sm" rows="3" placeholder="Résumé professionnel..." oninput="liveUpdate()" required><?php echo htmlspecialchars($d['resume'] ?? ''); ?></textarea></div>
                         </div>
                     </div>
@@ -403,7 +224,6 @@ $d = $_POST;
             <div class="preview-column" id="previewContainer">
                 <div id="cv-sheet" class="template-1">
                     <div id="area-header" class="tpl-header"></div>
-                    
                     <div class="tpl-container">
                         <div class="tpl-sidebar">
                             <img id="view-photo" src="" class="preview-photo">
@@ -412,38 +232,20 @@ $d = $_POST;
                                 <p id="view-titre" class="text-primary fw-bold mb-2" style="font-size: 0.85rem;">TITRE PROFESSIONNEL</p>
                                 <div class="small mb-3" id="view-contact"></div>
                             </div>
-                            
-                            <div class="section-wrapper">
-                                <div class="section-header">Compétences</div>
-                                <div id="view-competence"></div>
-                            </div>
-
-                            <div class="section-wrapper">
-                                <div class="section-header">Langues</div>
-                                <div id="view-langue" class="small"></div>
-                            </div>
+                            <div class="section-header">Compétences</div>
+                            <div id="view-competence"></div>
+                            <div class="section-header mt-4">Langues</div>
+                            <div id="view-langue" class="small"></div>
                         </div>
-
                         <div class="tpl-main">
-                            <div class="section-wrapper">
-                                <div class="section-header">Profil</div>
-                                <div id="view-resume" class="small" style="font-style: italic; opacity: 0.9; line-height: 1.6;"></div>
-                            </div>
-
-                            <div class="section-wrapper">
-                                <div class="section-header">Expériences Professionnelles</div>
-                                <div id="view-experience"></div>
-                            </div>
-
-                            <div class="section-wrapper">
-                                <div class="section-header">Formations</div>
-                                <div id="view-formation"></div>
-                            </div>
-
-                            <div class="section-wrapper">
-                                <div class="section-header">Centres d'intérêt</div>
-                                <div id="view-interet"></div>
-                            </div>
+                            <div class="section-header">Profil</div>
+                            <div id="view-resume" class="small mb-4" style="font-style: italic; opacity: 0.9; line-height: 1.6;"></div>
+                            <div class="section-header">Expériences Professionnelles</div>
+                            <div id="view-experience"></div>
+                            <div class="section-header">Formations</div>
+                            <div id="view-formation"></div>
+                            <div class="section-header">Centres d'intérêt</div>
+                            <div id="view-interet"></div>
                         </div>
                     </div>
                 </div>
@@ -452,24 +254,38 @@ $d = $_POST;
     </div>
 
     <script>
-        function escapeHtml(text) 
-        {
+        function escapeHtml(text) {
             if (!text) return "";
             const div = document.createElement('div');
             div.textContent = text;
             return div.innerHTML;
         }
 
-        function autoZoom() 
-        {
+        function autoZoom() {
             const container = document.getElementById('previewContainer');
             const sheet = document.getElementById('cv-sheet');
-            const scale = (container.offsetHeight - 40) / 1122;
-            sheet.style.transform = `scale(${scale})`;
+            const isMobile = window.innerWidth < 992;
+            
+            if (isMobile) {
+                // LOGIQUE MOBILE : On fixe la largeur et on évite le décentrage
+                const availableWidth = container.offsetWidth - 20;
+                const scale = availableWidth / 794; 
+                sheet.style.transform = `translateX(-50%) scale(${scale})`;
+                
+                // On force la hauteur du conteneur pour permettre le scroll fluide sans "vide"
+                const scaledHeight = 1122 * scale;
+                container.style.height = (scaledHeight + 40) + "px";
+            } else {
+                // LOGIQUE DESKTOP : Centrage pur
+                container.style.height = "auto";
+                const availableWidth = container.offsetWidth - 60;
+                const availableHeight = container.offsetHeight - 60;
+                const scale = Math.min(availableWidth / 794, availableHeight / 1122);
+                sheet.style.transform = `scale(${scale})`;
+            }
         }
 
-        function updateTemplate() 
-        {
+        function updateTemplate() {
             const val = document.getElementById('templateSelector').value;
             const sheet = document.getElementById('cv-sheet');
             const header = document.getElementById('area-header');
@@ -478,50 +294,40 @@ $d = $_POST;
             sheet.classList.remove('template-1', 'template-2', 'template-3', 'template-4');
             sheet.classList.add('template-' + val);
             
-            if (val == "3" || val == "4") 
-            {
+            if (val == "3" || val == "4") {
                 header.innerHTML = sidebarId.innerHTML;
                 header.style.display = 'block';
                 sidebarId.style.display = 'none';
-            } 
-            else 
-            {
+            } else {
                 header.style.display = 'none';
                 sidebarId.style.display = 'block';
             }
             liveUpdate();
         }
 
-        function addBlock(type, data = null) 
-        {
+        function addBlock(type, data = null) {
             const container = document.getElementById('container-' + type);
             const id = "id_" + Math.random().toString(36).substr(2, 9);
             let html = '';
-            
             const removeBtn = `<button type="button" class="btn-remove-block" onclick="removeBlock('${id}')"><i class="fa-solid fa-trash-can"></i></button>`;
             
-            if (type === 'competence' || type === 'langue') 
-            {
+            if (type === 'competence' || type === 'langue') {
                 html = `<div class="row g-2 mb-2 align-items-center" id="${id}">
                     <div class="col-5"><input type="text" name="${type}_nom[]" class="form-control form-control-sm" placeholder="${type}" value="${escapeHtml(data?.nom || '')}" oninput="liveUpdate()" required></div>
                     <div class="col-5"><input type="text" name="${type}_niveau[]" class="form-control form-control-sm" placeholder="Niveau" value="${escapeHtml(data?.niveau || '')}" oninput="liveUpdate()" required></div>
                     <div class="col-2 d-flex justify-content-end">${removeBtn}</div>
                 </div>`;
-            } 
-            else if (type === 'interet') 
-            {
+            } else if (type === 'interet') {
                 html = `<div class="row g-2 mb-2 align-items-center" id="${id}">
                     <div class="col-10"><input type="text" name="interet_nom[]" class="form-control form-control-sm" placeholder="Activité" value="${escapeHtml(data?.nom || '')}" oninput="liveUpdate()" required></div>
                     <div class="col-2 d-flex justify-content-end">${removeBtn}</div>
                 </div>`;
-            } 
-            else 
-            {
+            } else {
                 html = `<div class="dynamic-block" id="${id}">
                     <div class="position-absolute top-0 end-0 m-2">${removeBtn}</div>
                     <div class="row g-2">
-                        <div class="col-6"><input type="text" name="${type}_titre[]" class="form-control form-control-sm fw-bold" placeholder="Titre" value="${escapeHtml(data?.titre || '')}" oninput="liveUpdate()" required></div>
-                        <div class="col-6"><input type="text" name="${type}_etab[]" class="form-control form-control-sm" placeholder="Lieu" value="${escapeHtml(data?.etab || '')}" oninput="liveUpdate()" required></div>
+                        <div class="col-12 col-md-6"><input type="text" name="${type}_titre[]" class="form-control form-control-sm fw-bold" placeholder="Titre" value="${escapeHtml(data?.titre || '')}" oninput="liveUpdate()" required></div>
+                        <div class="col-12 col-md-6"><input type="text" name="${type}_etab[]" class="form-control form-control-sm" placeholder="Lieu" value="${escapeHtml(data?.etab || '')}" oninput="liveUpdate()" required></div>
                         <div class="col-6"><input type="text" name="${type}_debut[]" class="form-control form-control-sm" placeholder="Début" value="${escapeHtml(data?.debut || '')}" oninput="liveUpdate()" required></div>
                         <div class="col-6"><input type="text" name="${type}_fin[]" class="form-control form-control-sm" placeholder="Fin" value="${escapeHtml(data?.fin || '')}" oninput="liveUpdate()" required></div>
                         <div class="col-12"><textarea name="${type}_desc[]" class="form-control form-control-sm" rows="2" placeholder="Détails..." oninput="liveUpdate()" required>${escapeHtml(data?.desc || '')}</textarea></div>
@@ -534,8 +340,7 @@ $d = $_POST;
 
         function removeBlock(id) { document.getElementById(id).remove(); liveUpdate(); }
 
-        function liveUpdate() 
-        {
+        function liveUpdate() {
             const f = new FormData(document.getElementById('cvForm'));
             const name = (f.get('prenom') + ' ' + f.get('nom')).trim().toUpperCase() || "PRÉNOM NOM";
             document.querySelectorAll('#view-name').forEach(el => el.textContent = name);
@@ -548,7 +353,7 @@ $d = $_POST;
             ['experience', 'formation'].forEach(type => {
                 let h = '';
                 const t = document.getElementsByName(type+'_titre[]'), e = document.getElementsByName(type+'_etab[]'), d = document.getElementsByName(type+'_debut[]'), fn = document.getElementsByName(type+'_fin[]'), ds = document.getElementsByName(type+'_desc[]');
-                for(let i=0; i<t.length; i++) if(t[i].value) h += `<div class="block-item"><div class='fw-bold' style='font-size:0.9rem'>${escapeHtml(t[i].value)}</div><div class='text-muted small'>${escapeHtml(e[i].value)} | ${escapeHtml(d[i].value)} - ${escapeHtml(fn[i].value)}</div><div class='mt-1' style='font-size:0.75rem; white-space: pre-line;'>${escapeHtml(ds[i].value)}</div></div>`;
+                for(let i=0; i<t.length; i++) if(t[i].value) h += `<div class="block-item"><div class='fw-bold' style='font-size:0.9rem'>${escapeHtml(t[i].value)}</div><div class='text-muted small'>${escapeHtml(e[i].value)} | ${escapeHtml(d[i].value)} - ${escapeHtml(fn[i].value)}</div><div class='mt-1' style='font-size:0.75rem; white-space: pre-line;'>${escapeHtml(ds[i].value || '')}</div></div>`;
                 document.getElementById('view-'+type).innerHTML = h;
             });
 
@@ -565,53 +370,27 @@ $d = $_POST;
             document.getElementById('view-interet').innerHTML = iH;
         }
 
-        function previewImage(input) 
-        {
-            if (input.files && input.files[0]) 
-            {
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
                 const reader = new FileReader();
                 reader.onload = e => { const p = document.getElementById('view-photo'); p.src = e.target.result; p.style.display = 'block'; }
                 reader.readAsDataURL(input.files[0]);
             }
         }
 
-        // --- Chargement des données du CV déjà générer précédemment qui sont dans l'historique ---
-        window.onload = () => 
-        { 
+        window.onload = () => { 
             <?php
-            if(!empty($d['experience_titre'])) 
-            {
-                foreach($d['experience_titre'] as $i => $t) 
-                {
-                    echo "addBlock('experience', {titre:'$t', etab:'{$d['experience_etab'][$i]}', debut:'{$d['experience_debut'][$i]}', fin:'{$d['experience_fin'][$i]}', desc:'".str_replace(["\r","\n"],['','\n'],$d['experience_desc'][$i])."'});";
-                }
-            }
-            if(!empty($d['formation_titre'])) 
-            {
-                foreach($d['formation_titre'] as $i => $t) 
-                {
-                    echo "addBlock('formation', {titre:'$t', etab:'{$d['formation_etab'][$i]}', debut:'{$d['formation_debut'][$i]}', fin:'{$d['formation_fin'][$i]}', desc:'".str_replace(["\r","\n"],['','\n'],$d['formation_desc'][$i])."'});";
-                }
-            }
-            if(!empty($d['competence_nom']))
-                {
-                foreach($d['competence_nom'] as $i => $n)
-                {
-                    echo "addBlock('competence', {nom:'$n', niveau:'{$d['competence_niveau'][$i]}'});";
-                }
-            }
-            if(!empty($d['langue_nom']))
-            {
-                foreach($d['langue_nom'] as $i => $n) 
-                {
-                    echo "addBlock('langue', {nom:'$n', niveau:'{$d['langue_niveau'][$i]}'});";
-                }
-            }
-            if(!empty($d['interet_nom'])) 
-            {
-                foreach($d['interet_nom'] as $n)
-                {
-                    echo "addBlock('interet', {nom:'$n'});";
+            $fields = ['experience' => ['titre', 'etab', 'debut', 'fin', 'desc'], 'formation' => ['titre', 'etab', 'debut', 'fin', 'desc'], 'competence' => ['nom', 'niveau'], 'langue' => ['nom', 'niveau'], 'interet' => ['nom']];
+            foreach($fields as $type => $keys) {
+                if(!empty($d[$type.'_'.$keys[0]])) {
+                    foreach($d[$type.'_'.$keys[0]] as $i => $val) {
+                        $obj = [];
+                        foreach($keys as $k) {
+                            $v = str_replace(["\r","\n"],['','\n'], $d[$type.'_'.$k][$i] ?? '');
+                            $obj[] = "$k:'".addslashes($v)."'";
+                        }
+                        echo "addBlock('$type', {".implode(',', $obj)."});";
+                    }
                 }
             }
             ?>
