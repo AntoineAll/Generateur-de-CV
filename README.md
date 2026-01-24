@@ -15,7 +15,7 @@ L'outil permet de choisir entre plusieurs thèmes design et offre une solution c
 * **Moteur de rendu PDF** : Dompdf
 * **Gestionnaire de dépendances** : Composer
 
-**Note : Assure-toi d'avoir une version récente de PHP (8.0 ou plus recommandée). Vérifiez avec la commande suivante : php -v .**
+**Note : Assure-toi d'avoir une version récente de PHP (8.0 ou plus recommandée). Vérifier avec la commande suivante : php -v .**
 
 ---
 

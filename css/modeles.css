@@ -1,0 +1,73 @@
+:root { 
+    --grad: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+}
+
+body { 
+    background-color: #f8f9fa; 
+    padding-top: 80px; 
+}
+
+.navbar { 
+    background: var(--grad) !important; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+}
+
+.template-card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+    transition: transform 0.3s ease;
+    background: white;
+    overflow: hidden;
+}
+
+/* Désactiver le survol sur mobile pour éviter les bugs de scroll (les bugs ne sont pas fun)*/
+@media (min-width: 992px) {
+    .template-card:hover { transform: translateY(-10px); }
+    .template-card:hover img { transform: scale(1.03); }
+}
+
+.img-container {
+    height: 420px;
+    overflow: hidden;
+    background: #f1f1f1;
+    display: flex;
+    align-items: flex-start;
+    border-bottom: 1px solid #eee;
+}
+
+/* Ajuster la hauteur de l'aperçu sur mobile pour la lisibilité */
+@media (max-width: 576px) {
+    .img-container { height: 300px; }
+    .display-6 { font-size: 1.5rem; }
+}
+
+.img-container img {
+    width: 100%;
+    height: auto;
+    transition: transform 0.5s ease;
+}
+
+.btn-choose {
+    background: var(--grad);
+    border: none;
+    border-radius: 25px;
+    font-weight: bold;
+    padding: 10px 20px;
+    transition: 0.3s;
+    color: white;
+}
+
+.btn-choose:hover { 
+    opacity: 0.9; 
+    transform: scale(1.02); 
+    color: white; 
+}
+
+/* Gestion du footer pour ne pas cacher le contenu */
+@media (max-width: 768px) {
+    footer.fixed-bottom { 
+        position: relative; 
+        margin-top: 40px; 
+    }
+}

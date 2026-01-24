@@ -1,0 +1,65 @@
+body { 
+    font-family: 'Inter', sans-serif; 
+    background-color: #f8f9fa; 
+    min-height: 100vh; 
+    display: flex; 
+    flex-direction: column; 
+}
+
+.top-banner {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    margin-bottom: -50px;
+    padding-top: 60px;
+    position: relative;
+    z-index: 1; 
+}
+
+.contact-card {
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    padding: 40px;
+    position: relative;
+    z-index: 2;
+}
+
+.btn-send {
+    background: #764ba2;
+    border: none;
+    border-radius: 50px;
+    padding: 10px 30px;
+    color: white;
+    font-weight: bold;
+    transition: 0.3s;
+}
+
+.btn-send:hover {
+    background: #667eea;
+    transform: translateY(-2px);
+    color: white;
+}
+
+/* --- RESPONSIVE --- */
+@media (max-width: 768px) {
+    .top-banner { 
+        height: 180px; 
+        margin-bottom: -30px;
+    }
+    .top-banner h1 { 
+        font-size: 1.6rem; 
+        margin-bottom: 20px;
+    }
+    .contact-card { 
+        padding: 25px 20px; 
+        margin: 0 15px; /* Évite que la carte ne touche les bords du téléphone sinon le rendu est sale */
+    }
+    footer.fixed-bottom { 
+        position: relative; 
+        margin-top: 40px; 
+    }
+}
